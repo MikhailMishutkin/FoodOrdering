@@ -1,0 +1,172 @@
+{
+    "uuid": "51334510-68eb-45c3-b07d-202ca0e6002b",
+    "on_date": {
+        "seconds": 1684800000
+    },
+    "opening_record_at": {
+        "seconds": 1684839600
+    },
+    "closing_record_at": {
+        "seconds": 1684875600
+    },
+    "salads": [
+        {
+            "uuid": "4589679c-db2b-480f-b381-c6cf8adf114d",
+            "name": "Цезарь",
+            "description": "Хорошо сочетается с мясом",
+            "type": 1,
+            "weight": 197,
+            "price": 136.35573255634495,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 311020425
+            }
+        },
+        {
+            "uuid": "60b998f9-13df-4fa5-a088-685b3ac16d48",
+            "name": "Цезарь",
+            "description": "Легкий и вкусный",
+            "type": 1,
+            "weight": 184,
+            "price": 117.56928642500313,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 302993457
+            }
+        }
+    ],
+    "garnishes": [
+        {
+            "uuid": "f2424dd6-085f-42b2-88e1-01f6f87be1ee",
+            "name": "Гречка",
+            "description": "Отварное",
+            "type": 2,
+            "weight": 190,
+            "price": 126.06809121330922,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 304504330
+            }
+        },
+        {
+            "uuid": "0d7140f1-a121-4ce6-a1ab-96495cd8548a",
+            "name": "Пюре",
+            "description": "Отварное",
+            "type": 2,
+            "weight": 209,
+            "price": 135.60296424903945,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 312576846
+            }
+        }
+    ],
+    "meats": [
+        {
+            "uuid": "527a1e72-dc0b-4e4a-90b1-8247fb009d1c",
+            "name": "Сарделька",
+            "description": "Говяжья",
+            "type": 3,
+            "weight": 128,
+            "price": 102.74885816191168,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 314007093
+            }
+        },
+        {
+            "uuid": "b6572521-8793-4b46-bd73-fa18e73683b1",
+            "name": "Сарделька",
+            "description": "Говяжья",
+            "type": 3,
+            "weight": 185,
+            "price": 114.98601627472782,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 305854112
+            }
+        }
+    ],
+    "soups": [
+        {
+            "uuid": "d0395297-a2ce-4c7f-9bb1-27bbfcaa63fe",
+            "name": "Суп с фрикадельками",
+            "description": "Диетический",
+            "type": 4,
+            "weight": 131,
+            "price": 144.84792784562975,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 307088588
+            }
+        },
+        {
+            "uuid": "ad3ffde2-c43d-4ad0-bf53-495517fdcd17",
+            "name": "Суп с фрикадельками",
+            "description": "Диетический",
+            "type": 4,
+            "weight": 153,
+            "price": 138.4969127812828,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 315279311
+            }
+        }
+    ],
+    "drinks": [
+        {
+            "uuid": "f8806d81-4c80-4769-810d-f6f4bedc6b78",
+            "name": "Морс",
+            "description": "Домашний",
+            "type": 5,
+            "weight": 241,
+            "price": 148.29586601854683,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 316726337
+            }
+        },
+        {
+            "uuid": "0dbf7aab-d7c8-401c-8342-8105961f6396",
+            "name": "Компот",
+            "description": "Домашний",
+            "type": 5,
+            "weight": 191,
+            "price": 145.67522220147634,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 308343794
+            }
+        }
+    ],
+    "desserts": [
+        {
+            "uuid": "d108eef9-c89a-4446-adf6-93844252cf3c",
+            "name": "Медовик",
+            "description": "Белковый крем",
+            "type": 6,
+            "weight": 141,
+            "price": 145.02905021795374,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 309579021
+            }
+        },
+        {
+            "uuid": "12553112-0275-4101-97e3-4a1a5ad1eb08",
+            "name": "Медовик",
+            "description": "Масляный крем",
+            "type": 6,
+            "weight": 203,
+            "price": 125.4123124031415,
+            "created_at": {
+                "seconds": 1684777954,
+                "nanos": 318166774
+            }
+        }
+    ],
+    "created_at": {
+        "seconds": 1684778099,
+        "nanos": 850256913
+    }
+}
