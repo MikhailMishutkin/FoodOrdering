@@ -4,7 +4,8 @@ import (
 	"context"
 	"log"
 
-	pb "gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/customer"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -25,9 +26,15 @@ func conn() {
 	GetActualMenu(c)
 }
 
-func GetActualMenu(g pb.OrderServiceClient) {
+//TODO: переделать результат на GetActualMenuResponse, когда исправиться ситуация с v0.3.0
+func GetActualMenu(g pb.OrderServiceClient) *pb.GetActualMenuResponse {
 	log.Println("GetActualMenu was invoked")
 
 	menu := &pb.GetActualMenuRequest{}
 	res, err := g.GetActualMenu(context.Background(), menu)
+	if err != nil {
+		log.Fatalf("Error happend while getting actual menu: %v\n", err)
+	}
+
+	return res
 }
