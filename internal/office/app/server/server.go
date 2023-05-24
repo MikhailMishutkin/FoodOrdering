@@ -67,6 +67,7 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 
 func (cs *ServerCustomer) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {
 	go cs.repo.GetMenu()
+
 	a := &pb.GetActualMenuResponse{}
 	return a, nil
 }

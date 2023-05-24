@@ -46,5 +46,6 @@ func natsSubscriber() {
 }
 
 func (cr *CustomerRepo) GetMenu() {
+
 	go natsSubscriber()
 }

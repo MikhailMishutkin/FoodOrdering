@@ -10,7 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nats-io/nats.go v1.25.0
 	github.com/setrofim/enum v0.0.0-20221123204438-90f666ce13de
-	gitlab.com/mediasoft-internship/final-task/contracts v0.2.1
+	gitlab.com/mediasoft-internship/final-task/contracts v0.3.0
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 )

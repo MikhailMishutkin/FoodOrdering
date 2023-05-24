@@ -66,7 +66,7 @@ func (r *RestaurantRepo) GetMenu(t time.Time) *pb.Menu {
 		log.Fatal("can't read menu.json", err)
 	}
 	defer data.Close()
-	fmt.Println("время переданное в Гетменю: ", t)
+	fmt.Println("время переданное в Гетменю: ", t) //
 	m, _ := io.ReadAll(data)
 	menu := &pb.Menu{}
 	err = json.Unmarshal(m, menu)
