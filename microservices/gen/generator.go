@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
-	"gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	//"google.golang.org/protobuf/types/known/timestamppb"
 )

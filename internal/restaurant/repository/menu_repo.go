@@ -2,13 +2,12 @@ package repository
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
 	"time"
 
-	pb "gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/restaurant"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -33,7 +32,7 @@ func (r *RestaurantRepo) CreateMenu() (*pb.Menu, error) {
 		}
 	}
 
-	t := dateConv(time.Now())
+	t := DateConv(time.Now())
 
 	t1 := t.AddDate(0, 0, 1)
 	ts := timestamppb.New(t1)
@@ -66,17 +65,19 @@ func (r *RestaurantRepo) GetMenu(t time.Time) *pb.Menu {
 		log.Fatal("can't read menu.json", err)
 	}
 	defer data.Close()
-	fmt.Println("время переданное в Гетменю: ", t) //
+	//fmt.Println("время переданное в Гетменю: ", t) //
+
 	m, _ := io.ReadAll(data)
 	menu := &pb.Menu{}
-	err = json.Unmarshal(m, menu)
 
+	err = json.Unmarshal(m, menu)
 	if err != nil {
 		log.Fatal("cannot unmarshall menu", err)
 	}
+
 	d := menu.OnDate.AsTime()
-	fmt.Println("поле структуру меню OnDate: ", d)
-	t1 := dateConv(t)
+	//fmt.Println("поле структуру меню OnDate: ", d)
+	t1 := DateConv(t)
 	if d == t1 {
 
 		return menu

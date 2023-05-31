@@ -3,8 +3,8 @@ package repository
 import (
 	"sync"
 
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 	"github.com/google/uuid"
-	pb "gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/restaurant"
 )
 
 var dataMap map[string]*pb.Product

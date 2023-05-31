@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/MikhailMishutkin/FoodOrdering/microservices/serializer"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 	"github.com/jinzhu/copier"
-	pb "gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -48,7 +48,7 @@ func (r *RestaurantRepo) GetProductList() (*pb.GetProductListResponse, error) {
 	err := serializer.ReadProtobufFromBinaryFile(fileBin, p)
 	if err != nil {
 		code := codes.Internal
-		return nil, status.Errorf(code, "GetProductList went down witn error, cannot extract productlist from db: ", err)
+		return nil, status.Errorf(code, "GetProductList went down witn error, cannot extract productlist from db: %v\n", err)
 	}
 
 	return p, nil

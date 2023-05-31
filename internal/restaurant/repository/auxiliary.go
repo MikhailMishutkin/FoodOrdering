@@ -5,12 +5,12 @@ import (
 	"log"
 	"time"
 
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 	"github.com/nats-io/nats.go"
-	pb "gitlab.com/mediasoft-internship/final-task/contracts/pkg/contracts/restaurant"
 	"google.golang.org/protobuf/proto"
 )
 
-func dateConv(t time.Time) time.Time {
+func DateConv(t time.Time) time.Time {
 	var layout = "02.01.2006"
 	t1 := t.Format(layout)
 

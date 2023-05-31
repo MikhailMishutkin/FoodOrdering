@@ -1,24 +1,29 @@
 package main
 
-import (
-	"log"
+import "github.com/MikhailMishutkin/FoodOrdering/internal/app"
 
-	so "github.com/MikhailMishutkin/FoodOrdering/internal/office/app/server"
-)
+// import (
+// 	"log"
 
-// func init() {
-// 	err := godotenv.Load()
-// 	if err != nil {
-// 		log.Fatal("Error loading .env file")
+// 	cs "github.com/MikhailMishutkin/FoodOrdering/internal/customer/app/client"
+// )
+
+// // func init() {
+// // 	err := godotenv.Load()
+// // 	if err != nil {
+// // 		log.Fatal("Error loading .env file")
+// // 	}
+// // }
+
+// func main() {
+// 	//config := configs.NewConfig()
+// 	// gen.TypeSelector()
+// 	// gen.TypeSelector()
+
+// 	if err := cs.StartGRPCCustomerServer(); err != nil {
+// 		log.Fatal(err)
 // 	}
 // }
-
 func main() {
-	//config := configs.NewConfig()
-	// gen.TypeSelector()
-	// gen.TypeSelector()
-
-	if err := so.StartGRPCCustomerServer(); err != nil {
-		log.Fatal(err)
-	}
+	app.StartGRPC()
 }
