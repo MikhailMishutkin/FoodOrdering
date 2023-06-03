@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	res "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	//"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // generate products
 func TypeSelector() {
-	var m restaurant.ProductType
+	var m res.ProductType
 	fmt.Println(m)
-	var p *restaurant.Product
+	var p *res.Product
 	for {
 		m++
 		if m < 7 {
@@ -25,9 +25,9 @@ func TypeSelector() {
 	}
 }
 
-func NewProduct(p restaurant.ProductType) *restaurant.Product {
+func NewProduct(p res.ProductType) *res.Product {
 
-	return &restaurant.Product{
+	return &res.Product{
 		Uuid:        RandomID(),
 		Name:        randomProductName(p),
 		Description: randomDescription(p),

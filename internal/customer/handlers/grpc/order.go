@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/MikhailMishutkin/FoodOrdering/internal/customer/app/client"
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	cl "github.com/MikhailMishutkin/FoodOrdering/cmd/customer/customer_app"
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
 
 func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
@@ -15,7 +15,7 @@ func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderReq
 
 func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {
 	log.Println("GetActualMenu was invoked")
-	rmr, err := client.Сonn()
+	rmr, err := cl.Сonn()
 	if err != nil {
 		log.Println("client.Conn error", err)
 		return nil, err

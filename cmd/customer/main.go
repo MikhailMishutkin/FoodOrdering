@@ -1,6 +1,6 @@
 package main
 
-import "github.com/MikhailMishutkin/FoodOrdering/internal/app"
+import "github.com/MikhailMishutkin/FoodOrdering/cmd/customer/customer_app"
 
 // import (
 // 	"log"
@@ -25,5 +25,5 @@ import "github.com/MikhailMishutkin/FoodOrdering/internal/app"
 // 	}
 // }
 func main() {
-	app.StartGRPC()
+	customer_app.StartGRPC()
 }

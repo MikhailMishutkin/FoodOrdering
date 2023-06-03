@@ -1,7 +1,7 @@
 package handlers_customer
 
 import (
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 )
 
 type CustomerService struct {

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"github.com/google/uuid"
 )
 

@@ -2,14 +2,13 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/MikhailMishutkin/FoodOrdering/internal/app"
+	restaurant_app "github.com/MikhailMishutkin/FoodOrdering/cmd/restaurant/restaurant_app"
 	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
 )
 
 func init() {
-	os.Clearenv()
+	//os.Clearenv()
 	// err := godotenv.Load()
 	// if err != nil {
 	// 	log.Fatal("Error loading .env file")
@@ -21,7 +20,7 @@ func main() {
 	gen.TypeSelector()
 	gen.TypeSelector()
 
-	if err := app.StartGRPCAndHTTPServer(); err != nil {
+	if err := restaurant_app.StartGRPCAndHTTPServer(); err != nil {
 		log.Fatal(err)
 	}
 
