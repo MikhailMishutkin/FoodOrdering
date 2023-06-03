@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -37,11 +37,17 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
 	log.Print("GetMenu was invoked")
 
+	//log.Print(s.repoR)
 	ts := in.OnDate
 	//fmt.Println("время из запроса постман:", ts)
 	t := ts.AsTime()
 	//fmt.Println("время преобразованное в time:", t)
-	m := s.repoR.GetMenu(t)
+	m := &pb.Menu{}
+	m, err := s.repoR.GetMenu(t)
+
+	if err != nil {
+		return nil, err
+	}
 	//go repository.NatsPublisher()
 	resp := &pb.GetMenuResponse{}
 	resp.Menu = m

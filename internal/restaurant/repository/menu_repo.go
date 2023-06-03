@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -59,20 +59,28 @@ func (r *RestaurantRepo) CreateMenu() (*pb.Menu, error) {
 	return menu, nil
 }
 
-func (r *RestaurantRepo) GetMenu(t time.Time) *pb.Menu {
+func (r *RestaurantRepo) GetMenu(t time.Time) (*pb.Menu, error) {
+	log.Printf("GetMenu Repository was invoked")
+	menuInst := pb.Menu{}
 	data, err := os.OpenFile("menu.json", os.O_RDONLY, 0644)
 	if err != nil {
 		log.Fatal("can't read menu.json", err)
+		return &menuInst, err
 	}
 	defer data.Close()
 	//fmt.Println("время переданное в Гетменю: ", t) //
 
-	m, _ := io.ReadAll(data)
+	m, err := io.ReadAll(data)
+	if err != nil {
+		log.Println("Can't read data from menu.json: ", err)
+		return &menuInst, err
+	}
 	menu := &pb.Menu{}
 
 	err = json.Unmarshal(m, menu)
 	if err != nil {
 		log.Fatal("cannot unmarshall menu", err)
+		return &menuInst, err
 	}
 
 	d := menu.OnDate.AsTime()
@@ -80,8 +88,8 @@ func (r *RestaurantRepo) GetMenu(t time.Time) *pb.Menu {
 	t1 := DateConv(t)
 	if d == t1 {
 
-		return menu
+		return menu, nil
 	}
 
-	return nil
+	return &menuInst, nil
 }
