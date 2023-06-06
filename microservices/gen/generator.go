@@ -1,9 +1,11 @@
 package gen
 
 import (
-	"fmt"
+	"log"
 
+	handlers_customer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/grpc"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
+	cus "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	res "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	//"google.golang.org/protobuf/types/known/timestamppb"
@@ -12,7 +14,7 @@ import (
 // generate products
 func TypeSelector() {
 	var m res.ProductType
-	fmt.Println(m)
+	log.Println(m)
 	var p *res.Product
 	for {
 		m++
@@ -25,6 +27,12 @@ func TypeSelector() {
 	}
 }
 
+func OfficeGen() {
+	var o *cus.Office
+	o = NewOffice()
+	(&handlers_customer.CustomerService{}).CreateOffice(o)
+}
+
 func NewProduct(p res.ProductType) *res.Product {
 
 	return &res.Product{
@@ -35,5 +43,15 @@ func NewProduct(p res.ProductType) *res.Product {
 		Weight:      randomWeight(),
 		Price:       randomPrice(),
 		CreatedAt:   timestamppb.Now(),
+	}
+}
+
+func NewOffice() *cus.Office {
+	n, a := randomOffice()
+	return &cus.Office{
+		Uuid:      RandomID(),
+		Name:      n,
+		Address:   a,
+		CreatedAt: timestamppb.Now(),
 	}
 }

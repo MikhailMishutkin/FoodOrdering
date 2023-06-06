@@ -45,16 +45,10 @@ func natsSubscriber() {
 
 }
 
-func (cr *CustomerRepo) GetActualMenu(menu *pb.GetActualMenuResponse) {
-	m := dataMap
-	salads := menu.Salads
-	for _, v := range salads {
-		m[v.Uuid] = v
-	}
+func (cr *CustomerRepo) CreateOrder() {
 
-	//go natsSubscriber()
 }
 
-func (cr *CustomerRepo) CreateOrder() {
+func (cr *CustomerRepo) CreateOffice() {
 
 }

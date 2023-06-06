@@ -65,7 +65,7 @@ func (r *RestaurantRepo) GetMenu(t time.Time) (*pb.Menu, error) {
 	data, err := os.OpenFile("menu.json", os.O_RDONLY, 0644)
 	if err != nil {
 		log.Fatal("can't read menu.json", err)
-		return &menuInst, err
+
 	}
 	defer data.Close()
 	//fmt.Println("время переданное в Гетменю: ", t) //
@@ -80,7 +80,6 @@ func (r *RestaurantRepo) GetMenu(t time.Time) (*pb.Menu, error) {
 	err = json.Unmarshal(m, menu)
 	if err != nil {
 		log.Fatal("cannot unmarshall menu", err)
-		return &menuInst, err
 	}
 
 	d := menu.OnDate.AsTime()

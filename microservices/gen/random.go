@@ -16,6 +16,12 @@ func RandomID() string {
 	return uuid.New().String()
 }
 
+func randomOffice() (string, string) {
+	name := randomStringFromSet("Ателье", "Магазин Бум", "Офис Гранд")
+	adress := randomStringFromSet("Гончарова 22, оф. 3", "К. Маркса 5а, оф. 17", "ул. Мира 7, оф. 36")
+	return name, adress
+}
+
 func randomProductName(t restaurant.ProductType) string {
 
 	switch t {

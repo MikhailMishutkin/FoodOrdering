@@ -36,15 +36,10 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
 	log.Print("GetMenu was invoked")
-
-	//log.Print(s.repoR)
 	ts := in.OnDate
-	//fmt.Println("время из запроса постман:", ts)
 	t := ts.AsTime()
-	//fmt.Println("время преобразованное в time:", t)
 	m := &pb.Menu{}
 	m, err := s.repoR.GetMenu(t)
-
 	if err != nil {
 		return nil, err
 	}

@@ -15,7 +15,6 @@ type RestaurantService struct {
 }
 
 func NewRestaurantService(rp RestaurantRepository) *RestaurantService {
-	//	log.Println("check repoR", rp)
 	return &RestaurantService{repoR: rp}
 }
 

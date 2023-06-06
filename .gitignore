@@ -5,5 +5,5 @@ apiserver
 LICENSE
 migrate
 .env
-\gitlab.com/
 broker/
+vendor/

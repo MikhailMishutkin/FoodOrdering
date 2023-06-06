@@ -3,24 +3,24 @@ package main
 import (
 	"log"
 
-	restaurant_app "github.com/MikhailMishutkin/FoodOrdering/cmd/restaurant/restaurant_app"
+	app "github.com/MikhailMishutkin/FoodOrdering/cmd"
+	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
 )
 
 func init() {
-	//os.Clearenv()
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+
 }
 
 func main() {
-	//config := configs.NewConfig()
+	conf, err := configs.New("./configs/main.yaml.template")
+	if err != nil {
+		log.Fatalf("can't receive config data: %v\n", err)
+	}
 	gen.TypeSelector()
 	gen.TypeSelector()
 
-	if err := restaurant_app.StartGRPCAndHTTPServer(); err != nil {
+	if err := app.StartGRPCAndHTTPServer(conf); err != nil {
 		log.Fatal(err)
 	}
 
