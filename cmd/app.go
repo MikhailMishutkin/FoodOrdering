@@ -26,9 +26,15 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	repo := repository.NewRestaurantRepo()
 	rs := handlers.NewRestaurantService(repo)
 
+	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect: %v\n", err)
+	}
+	defer conn.Close()
+
 	repoC := cusrepository.NewCustomerRepo()
 	cu := service.NewCustomerUsecase(repoC)
-	cs := handlers_customer.NewCustomerService(cu)
+	cs := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 
 	s := grpc.NewServer()
 
@@ -41,7 +47,7 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	cust.RegisterOrderServiceServer(s, &handlers_customer.CustomerService{})
 
 	router := runtime.NewServeMux()
-	err := rest.RegisterProductServiceHandlerServer(ctx, router, rs)
+	err = rest.RegisterProductServiceHandlerServer(ctx, router, rs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
@@ -90,6 +96,7 @@ func StartGRPC(conf configs.Config) {
 	n := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 
 	s := grpc.NewServer()
+
 	rest.RegisterMenuServiceServer(s, rs)
 
 	cust.RegisterOrderServiceServer(s, n)
