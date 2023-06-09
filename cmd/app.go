@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
+	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -24,7 +25,8 @@ import (
 
 func StartGRPCAndHTTPServer(conf configs.Config) error {
 	repo := repository.NewRestaurantRepo()
-	rs := handlers.NewRestaurantService(repo)
+	ru := serviceR.NewRestaurantUsecace(repo)
+	rs := handlers.NewRestaurantService(ru)
 
 	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -45,6 +47,8 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	rest.RegisterMenuServiceServer(s, &handlers.RestaurantService{})
 	rest.RegisterOrderServiceServer(s, &handlers.RestaurantService{})
 	cust.RegisterOrderServiceServer(s, &handlers_customer.CustomerService{})
+	cust.RegisterOfficeServiceServer(s, &handlers_customer.CustomerService{})
+	cust.RegisterUserServiceServer(s, &handlers_customer.CustomerService{})
 
 	router := runtime.NewServeMux()
 	err = rest.RegisterProductServiceHandlerServer(ctx, router, rs)
@@ -62,6 +66,16 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	}
 
 	err = cust.RegisterOrderServiceHandlerServer(ctx, router, cs)
+	if err != nil {
+		log.Printf("Failed to register gateway: %v\n", err)
+	}
+
+	err = cust.RegisterOfficeServiceHandlerServer(ctx, router, cs)
+	if err != nil {
+		log.Printf("Failed to register gateway: %v\n", err)
+	}
+
+	err = cust.RegisterUserServiceHandlerServer(ctx, router, cs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
@@ -84,7 +98,8 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 
 func StartGRPC(conf configs.Config) {
 	repo := repository.NewRestaurantRepo()
-	rs := handlers.NewRestaurantService(repo)
+	ru := serviceR.NewRestaurantUsecace(repo)
+	rs := handlers.NewRestaurantService(ru)
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v\n", err)

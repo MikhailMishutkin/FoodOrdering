@@ -1,9 +1,6 @@
 package gen
 
 import (
-	"log"
-
-	handlers_customer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/grpc"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
 	cus "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	res "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
@@ -14,7 +11,7 @@ import (
 // generate products
 func TypeSelector() {
 	var m res.ProductType
-	log.Println(m)
+	//log.Println(m)
 	var p *res.Product
 	for {
 		m++
@@ -27,11 +24,11 @@ func TypeSelector() {
 	}
 }
 
-func OfficeGen() {
-	var o *cus.Office
-	o = NewOffice()
-	(&handlers_customer.CustomerService{}).CreateOffice(o)
-}
+//func OfficeGen() {
+//	var o *cus.Office
+//	o = NewOffice()
+//	(&handlers_customer.CustomerService{}).CreateOffice(o)
+//}
 
 func NewProduct(p res.ProductType) *res.Product {
 

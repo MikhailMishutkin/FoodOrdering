@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
@@ -18,15 +19,11 @@ func (cu *CustomerUsecase) GetActualMenu(res *restaurant.GetMenuResponse) (amr *
 	}
 
 	return amr, nil
-
 }
 
-func (cu *CustomerUsecase) CreateOrder() {
-
-}
-
-func (cu *CustomerUsecase) CreateOffice(*pb.Office) {
-
+func (cu *CustomerUsecase) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	res, err := cu.repoC.CreateOrder(in)
+	return res, err
 }
 
 func ProductConv(p []*restaurant.Product) []*pb.Product {

@@ -11,23 +11,23 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-var dataMap map[string]*pb.Product
+var officeMap map[string]*pb.Office
 
 func init() {
-	dataMap = make(map[string]*pb.Product)
+	officeMap = make(map[string]*pb.Office)
 }
 func RandomID() string {
 	return uuid.New().String()
 }
 
 type CustomerRepo struct {
-	mutex   sync.RWMutex
-	dataMap map[string]*pb.Product
+	mutex     sync.RWMutex
+	officeMap map[string]*pb.Office
 }
 
 func NewCustomerRepo() *CustomerRepo {
 	return &CustomerRepo{
-		dataMap: dataMap,
+		officeMap: officeMap,
 	}
 }
 
@@ -46,9 +46,5 @@ func natsSubscriber() {
 }
 
 func (cr *CustomerRepo) CreateOrder() {
-
-}
-
-func (cr *CustomerRepo) CreateOffice() {
 
 }

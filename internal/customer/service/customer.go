@@ -1,6 +1,9 @@
 package service
 
-import rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+import (
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
+	rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+)
 
 type CustomerUsecase struct {
 	rest.UnimplementedOrderServiceServer
@@ -19,6 +22,9 @@ func New(client rest.MenuServiceClient) *CustomerUsecase {
 }
 
 type CustomerRepository interface {
-	CreateOrder()
-	CreateOffice()
+	CreateOffice(office *pb.Office) error
+	GetOfficeList() ([]*pb.Office, error)
+	CreateUser(user *pb.User) error
+	GetUserList(string) (*pb.GetUserListResponse, error)
+	CreateOrder(*pb.CreateOrderRequest) (*pb.CreateOrderResponse, error)
 }

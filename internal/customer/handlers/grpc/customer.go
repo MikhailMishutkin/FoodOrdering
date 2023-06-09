@@ -28,8 +28,10 @@ func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerServ
 }
 
 type CustomerServicer interface {
-	CreateOrder()
-	CreateOffice(*pb.Office)
-
+	CreateOffice(*pb.Office) error
+	GetOfficeList() ([]*pb.Office, error)
+	CreateUser(*pb.User) error
+	GetUserList(*pb.GetUserListRequest) (*pb.GetUserListResponse, error)
 	GetActualMenu(*restaurant.GetMenuResponse) (*pb.GetActualMenuResponse, error)
+	CreateOrder(*pb.CreateOrderRequest) (*pb.CreateOrderResponse, error)
 }

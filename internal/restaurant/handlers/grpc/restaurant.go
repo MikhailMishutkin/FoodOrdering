@@ -11,14 +11,14 @@ type RestaurantService struct {
 	pb.UnimplementedMenuServiceServer
 	pb.UnimplementedOrderServiceServer
 
-	repoR RestaurantRepository
+	rSer RestaurantServicer
 }
 
-func NewRestaurantService(rp RestaurantRepository) *RestaurantService {
-	return &RestaurantService{repoR: rp}
+func NewRestaurantService(rs RestaurantServicer) *RestaurantService {
+	return &RestaurantService{rSer: rs}
 }
 
-type RestaurantRepository interface {
+type RestaurantServicer interface {
 	CreateProduct(*pb.Product) error
 	GetProductList() (*pb.GetProductListResponse, error)
 	CreateMenu() (*pb.Menu, error)

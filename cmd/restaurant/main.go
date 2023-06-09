@@ -5,7 +5,6 @@ import (
 
 	app "github.com/MikhailMishutkin/FoodOrdering/cmd"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
-	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
 )
 
 func init() {
@@ -17,8 +16,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't receive config data: %v\n", err)
 	}
-	gen.TypeSelector()
-	gen.TypeSelector()
 
 	if err := app.StartGRPCAndHTTPServer(conf); err != nil {
 		log.Fatal(err)

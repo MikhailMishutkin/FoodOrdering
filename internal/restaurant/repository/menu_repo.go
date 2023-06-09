@@ -68,7 +68,6 @@ func (r *RestaurantRepo) GetMenu(t time.Time) (*pb.Menu, error) {
 
 	}
 	defer data.Close()
-	//fmt.Println("время переданное в Гетменю: ", t) //
 
 	m, err := io.ReadAll(data)
 	if err != nil {

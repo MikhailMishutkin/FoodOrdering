@@ -12,7 +12,8 @@ import (
 )
 
 func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	return nil, nil
+	res, err := s.cs.CreateOrder(in)
+	return res, err
 }
 
 func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {
@@ -37,8 +38,4 @@ func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMen
 		return nil, err
 	}
 	return amr, nil
-}
-
-func (s *CustomerService) CreateOffice(*pb.Office) {
-
 }
