@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package foodordering.restaurant;
+
+option go_package = "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant";
+
+import "google/api/annotations.proto";
+
+service OrderService {
+  rpc GetUpToDateOrderList(GetUpToDateOrderListRequest) returns (GetUpToDateOrderListResponse) {
+    option (google.api.http) = {
+      get: "/restaurant/orders"
+    };
+  }
+};
+
+message GetUpToDateOrderListRequest {
+}
+
+message GetUpToDateOrderListResponse {
+  repeated Order total_orders = 1;
+  repeated OrdersByOffice total_orders_by_company = 2;
+}
+
+message OrdersByOffice {
+  string office_uuid = 1;
+  string office_name = 2;
+  string office_address = 3;
+  repeated Order result = 4;
+}
+
+message Order {
+  string product_id = 1;
+  string product_name = 2;
+  int64 count = 3;
+}
+

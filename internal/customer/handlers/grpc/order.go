@@ -3,6 +3,7 @@ package handlers_customer
 import (
 	"context"
 	"fmt"
+	natscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/nats"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
@@ -12,8 +13,10 @@ import (
 )
 
 func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	res, err := s.cs.CreateOrder(in)
-	return res, err
+	//res, err := s.cs.CreateOrder(in)
+	a := &natscustomer.NatsPub{}
+	err := a.NatsPublisher(in)
+	return &pb.CreateOrderResponse{}, err
 }
 
 func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {

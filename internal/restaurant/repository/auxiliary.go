@@ -6,7 +6,6 @@ import (
 	"time"
 
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
-	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -37,17 +36,4 @@ func FromMapToSlice() (sp []*pb.Product) {
 	}
 
 	return sp
-}
-
-func NatsPublisher() {
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		log.Fatalf("can't connect to NATS: %v", err)
-	}
-	defer nc.Close()
-
-	for {
-		nc.Publish("intros", []byte("Hello1 World!"))
-		time.Sleep(1 * time.Second)
-	}
 }

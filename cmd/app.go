@@ -3,8 +3,10 @@ package app
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
+	natscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/nats"
 	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/nats-io/nats.go"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
@@ -127,3 +129,33 @@ func StartGRPC(conf configs.Config) {
 		log.Fatalf("Failed to serve: %v\n", err)
 	}
 }
+
+func StartNATS() error {
+	nc, err := nats.Connect(nats.DefaultURL)
+	if err != nil {
+		log.Printf("can't connect to NATS: %v", err)
+		return err
+	}
+	defer nc.Drain()
+
+	js, err := nc.JetStream()
+	if err != nil {
+		log.Println("error line 141 app: ", err)
+	}
+	streamName := "ORDER"
+	js.AddStream(&nats.StreamConfig{
+		Name:     streamName,
+		Subjects: []string{"orders.>"},
+	})
+
+	_ = natscustomer.NewNATS(js)
+	//	js.Publish("orders.>", data)
+
+	return err
+}
+
+//data, err := proto.Marshal(order)
+//if err != nil {
+//	fmt.Errorf("cannot marshal proto message to binary: %w", err)
+//	return err
+//}

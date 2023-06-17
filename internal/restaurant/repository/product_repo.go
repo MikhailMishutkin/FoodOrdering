@@ -30,7 +30,6 @@ func (r *RestaurantRepo) CreateProduct(p *pb.Product) error {
 	if err != nil {
 		return fmt.Errorf("cannot copy product data: %w", err)
 	}
-	//r.dataMap = make(map[string]*pb.Product)
 
 	dataMap[other.Uuid] = other
 

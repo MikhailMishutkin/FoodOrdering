@@ -82,7 +82,7 @@ func (r *RestaurantRepo) GetMenu(t time.Time) (*pb.Menu, error) {
 	}
 
 	d := menu.OnDate.AsTime()
-	//fmt.Println("поле структуру меню OnDate: ", d)
+	//fmt.Println("поле структуры меню OnDate: ", d)
 	t1 := DateConv(t)
 	if d == t1 {
 

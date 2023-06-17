@@ -2,13 +2,9 @@ package cusrepository
 
 import (
 	"fmt"
-	"log"
-	"sync"
-	"time"
-
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"github.com/google/uuid"
-	"github.com/nats-io/nats.go"
+	"sync"
 )
 
 var officeMap map[string]*pb.Office
@@ -31,20 +27,8 @@ func NewCustomerRepo() *CustomerRepo {
 	}
 }
 
-func natsSubscriber() {
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		log.Fatalf("can't connect to NATS: %v", err)
-	}
-	defer nc.Close()
-
-	nc.Subscribe("intros", func(m *nats.Msg) {
-		fmt.Println(string(m.Data))
-	})
-	time.Sleep(30 * time.Second)
-
-}
-
-func (cr *CustomerRepo) CreateOrder() {
-
+func (cr *CustomerRepo) CreateOrder(order *pb.CreateOrderRequest) error {
+	fmt.Println("save neworder in db", order)
+	//TODO: connect db
+	return nil
 }

@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	API API `yaml:"api"`
-	DB  DB  `yaml:"db"`
+	API  API  `yaml:"api"`
+	DB   DB   `yaml:"db"`
+	NATS NATS `yaml:"nats"`
 	// FileStorage FileStorage `yaml:"file_storage"`
 }
 
@@ -26,6 +27,10 @@ type (
 		Conn string `json:"conn"`
 	}
 
+	NATS struct {
+		Name     string   `yaml:"name",json:"name"`
+		Subjects []string `yaml:"subjects",json:"subjects,omitempty"`
+	}
 	// FileStorage struct {
 	// 	Dir string `yaml:"dir"`
 	// }

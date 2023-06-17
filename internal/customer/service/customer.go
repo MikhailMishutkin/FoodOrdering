@@ -26,5 +26,5 @@ type CustomerRepository interface {
 	GetOfficeList() ([]*pb.Office, error)
 	CreateUser(user *pb.User) error
 	GetUserList(string) (*pb.GetUserListResponse, error)
-	CreateOrder(*pb.CreateOrderRequest) (*pb.CreateOrderResponse, error)
+	CreateOrder(*pb.CreateOrderRequest) error
 }

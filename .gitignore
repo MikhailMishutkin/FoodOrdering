@@ -1,9 +1,9 @@
 apiserver.toml
 .vscode
-api
 apiserver
 LICENSE
 migrate
 .env
 broker/
 vendor/
+.idea

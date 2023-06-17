@@ -1,3 +1,7 @@
 api:
   host: "localhost:8080"
   hostgRPC: "localhost:5051"
+
+nats:
+    name: "ORDER"
+    subjects: ["orders.>"]
