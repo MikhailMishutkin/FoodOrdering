@@ -3,5 +3,5 @@ api:
   hostgRPC: "localhost:5051"
 
 nats:
-    name: "ORDER"
-    subjects: ["orders.>"]
+    name: "ORDERS"
+    consumername: "restaurant"

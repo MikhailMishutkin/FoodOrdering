@@ -19,21 +19,37 @@ func NewNATS(js nats.JetStream) *NatsPub {
 }
 func (np *NatsPub) NatsPublisher(order *pb.CreateOrderRequest) error {
 	log.Println("customer publisher")
-
+	fmt.Println(order)
 	data, err := proto.Marshal(order)
 	if err != nil {
 		fmt.Errorf("cannot marshal proto message to binary: %w", err)
 		return err
 	}
-
-	np.js.Publish("orders.>", data)
+	fmt.Println("after marshaling: ", data)
 
 	return err
 }
 
+//_, err = js.AddConsumer("ORDERS", &nats.ConsumerConfig{
+//Durable:      "my-consumer-1",
+//Description:  "this is my awesome consumer",
+//ReplayPolicy: nats.ReplayInstantPolicy,
+//})
+//fatalOnErr(err)
+//
+//sub, err := js.PullSubscribe("orders.us", "my-consumer-1")
+//fatalOnErr(err)
+//go processMsg(sub)
+//
+//time.Sleep(10 * time.Second)
+//sub.Unsubscribe()
+//
+//log.Println("shutting down application...")
+//}
+
 //for {
 //	resp, err := nc.Request("order", data, 500*time.Millisecond)
-//	time.Sleep(1 * time.Second)
+//	time.Sleep(1 * time.Second)Платежное поручение 00БП-000036 от 21.02.2023 16:22:57
 //	if err != nil {
 //		log.Printf("error sending message %v\n", err)
 //		continue

@@ -1,13 +1,9 @@
 package service
 
 import (
-	natscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/nats"
-	natsrestaurant "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/handlers/nats"
-	natsstat "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/handlers/nats"
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"log"
-	"time"
 )
 
 // GetActualMenu from restaurant DB
@@ -27,11 +23,8 @@ func (cu *CustomerUsecase) GetActualMenu(res *restaurant.GetMenuResponse) (amr *
 
 func (cu *CustomerUsecase) CreateOrder(in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	log.Println("CreateOrder service was invoked")
-	err := natscustomer.NatsPublisher(in)
-	time.Sleep(3 * time.Second) // wait for publishing
-	err = natsrestaurant.NatsSubscriber()
-	err = natsstat.NatsSubscriber()
-	//err = cu.repoC.CreateOrder(in)
+
+	err := cu.repoC.CreateOrder(in)
 	return &pb.CreateOrderResponse{}, err
 }
 

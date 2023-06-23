@@ -9,6 +9,8 @@ import (
 
 func (s *RestaurantService) GetUpToDateOrderList(ctx context.Context, in *pb.GetUpToDateOrderListRequest) (*pb.GetUpToDateOrderListResponse, error) {
 	log.Print("GetUpToDateOrderList was invoked")
-	s.rSer.GetOrderList()
-	return nil, nil
+	a, _ := s.rSer.GetOrderList()
+	return &pb.GetUpToDateOrderListResponse{
+		TotalOrders: a,
+	}, nil
 }

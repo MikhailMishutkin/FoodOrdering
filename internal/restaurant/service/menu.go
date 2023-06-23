@@ -14,7 +14,3 @@ func (su *RestaurantUsecase) GetMenu(t time.Time) (*pb.Menu, error) {
 	m, err := su.repoR.GetMenu(t)
 	return m, err
 }
-
-func (su *RestaurantUsecase) GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice) {
-	return nil, nil
-}

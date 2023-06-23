@@ -28,8 +28,9 @@ type (
 	}
 
 	NATS struct {
-		Name     string   `yaml:"name",json:"name"`
-		Subjects []string `yaml:"subjects",json:"subjects,omitempty"`
+		Name string `yaml:"name",json:"name"`
+		//	Subjects []string `yaml:"subjects",json:"subjects,omitempty"`
+		Consumer string `yaml:"consumername",json:"consumername"`
 	}
 	// FileStorage struct {
 	// 	Dir string `yaml:"dir"`

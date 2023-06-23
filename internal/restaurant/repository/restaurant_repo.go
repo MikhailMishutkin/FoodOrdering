@@ -26,9 +26,3 @@ func NewRestaurantRepo() *RestaurantRepo {
 		dataMap: dataMap,
 	}
 }
-
-//TODO: перенести в отедльный файл Orders
-func (r *RestaurantRepo) GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice) {
-
-	return nil, nil
-}

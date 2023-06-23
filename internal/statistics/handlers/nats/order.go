@@ -30,7 +30,7 @@ func NatsSubscriber() error {
 	consumerName := "statistics"
 	js.AddConsumer(config.NATS.Name, &nats.ConsumerConfig{
 		Durable:        consumerName,
-		DeliverSubject: "orders.>",
+		DeliverSubject: "orders",
 		AckPolicy:      nats.AckExplicitPolicy,
 		AckWait:        time.Second,
 	})
