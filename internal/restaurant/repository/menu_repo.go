@@ -12,7 +12,7 @@ import (
 )
 
 func (r *RestaurantRepo) CreateMenu() (*pb.Menu, error) {
-	m := dataMap
+	m := make(map[string]*pb.Product) //настройка бд
 
 	var Salads, Garnishes, Meats, Soups, Drinks, Desserts []*pb.Product
 	for _, v := range m {

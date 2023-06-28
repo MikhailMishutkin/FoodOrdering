@@ -60,3 +60,13 @@ func ReadProtobufFromBinaryFile(filename string, message proto.Message) error {
 
 	return nil
 }
+
+// serialize
+func WriteProtobufBinary(message proto.Message) ([]byte, error) {
+	data, err := proto.Marshal(message)
+	if err != nil {
+		return nil, fmt.Errorf("cannot marshal proto message to binary: %w", err)
+	}
+
+	return data, err
+}

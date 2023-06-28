@@ -19,8 +19,8 @@ func NewRestaurantService(rs RestaurantServicer) *RestaurantService {
 }
 
 type RestaurantServicer interface {
-	CreateProduct(*pb.Product) error
-	GetProductList() (*pb.GetProductListResponse, error)
+	CreateProduct([]byte) error
+	GetProductList() ([]byte, error)
 	CreateMenu() (*pb.Menu, error)
 	GetMenu(time.Time) (*pb.Menu, error)
 	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)

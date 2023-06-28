@@ -12,6 +12,7 @@ import (
 	cust "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
@@ -22,7 +23,11 @@ import (
 )
 
 func StartGRPCAndHTTPServer(conf configs.Config) error {
-	repo := repository.NewRestaurantRepo()
+	db, err := repository.NewDB()
+	if err != nil {
+		log.Fatal("cannot connect to db: ", err)
+	}
+	repo := repository.NewRestaurantRepo(db)
 	ru := serviceR.NewRestaurantUsecace(repo)
 	rs := handlers.NewRestaurantService(ru)
 
@@ -95,7 +100,11 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 }
 
 func StartGRPC(conf configs.Config) {
-	repo := repository.NewRestaurantRepo()
+	db, err := repository.NewDB()
+	if err != nil {
+		log.Fatal("cannot connect to db: ", err)
+	}
+	repo := repository.NewRestaurantRepo(db)
 	ru := serviceR.NewRestaurantUsecace(repo)
 	rs := handlers.NewRestaurantService(ru)
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))

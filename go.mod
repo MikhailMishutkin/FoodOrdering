@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/jinzhu/copier v0.3.5
+	github.com/lib/pq v1.10.9
 	github.com/nats-io/nats.go v1.26.0
 	github.com/pkg/errors v0.9.1
 	go.uber.org/multierr v1.11.0

@@ -1,7 +1,24 @@
-restaurant:
-go build -o bin/restaurant/server ./calculator/server
-go build -o bin/restaurant/client ./calculator/client
-gengw:
-protoc -I/usr/local/include -I.    -I$GOPATH    -I$GOPATH/FoodOrdering/pkg/contracts-v0.2.1/third_party/googleapis    --grpc-gateway_out=logtostderr=true:.    pkg/contracts-v0.2.1/api/mediasoft-internship/final-task/contracts/restaurant/restaurant_product.proto
+DB_URL=postgresql://root:123@localhost:5432/restaurant?sslmode=disable
 
-.PHONY: gengw restaurant 
+network:
+	docker network create foodordering-network
+
+postgres:
+	docker run --name postgres --network foodordering-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123 -d postgres:14-alpine
+
+createdb:
+	docker exec -it postgres createdb --username=root --owner=root restaurant
+
+dropdb:
+	docker exec -it postgres dropdb restaurant
+
+migrateup:
+	migrate -path migrations -database "$(DB_URL)" -verbose up
+
+migratedown:
+	migrate -path migrations -database "$(DB_URL)" -verbose down
+
+http:
+	go build -v ./cmd/httpserver
+
+.PHONY: network postgres createdb dropdb migrateup migratedown http

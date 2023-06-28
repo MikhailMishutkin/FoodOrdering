@@ -24,7 +24,7 @@ type (
 	}
 
 	DB struct {
-		Conn string `json:"conn"`
+		Conn string `yaml:"conn"`
 	}
 
 	NATS struct {
