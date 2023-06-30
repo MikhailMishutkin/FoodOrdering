@@ -1,6 +1,7 @@
 package serviceR
 
 import (
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"time"
 )
@@ -16,9 +17,9 @@ func NewRestaurantUsecace(rr RestaurantRepository) *RestaurantUsecase {
 }
 
 type RestaurantRepository interface {
-	CreateProduct([]byte) error
-	GetProductList() ([]byte, error)
-	CreateMenu() (*pb.Menu, error)
-	GetMenu(time.Time) (*pb.Menu, error)
+	CreateProduct(product *types.Product) error
+	GetProductList() ([]*types.Product, error)
+	CreateMenu(mc *types.MenuCreate) error
+	GetMenu(time.Time) (*types.Menu, error)
 	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
 }

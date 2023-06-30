@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
-	"sync"
-
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 )
@@ -17,14 +15,13 @@ func RandomID() string {
 }
 
 type RestaurantRepo struct {
-	mutex sync.RWMutex
+	DB *sql.DB
 	//dataMap map[string]*pb.Product
-	db *sql.DB
 }
 
 func NewRestaurantRepo(db *sql.DB) *RestaurantRepo {
 	return &RestaurantRepo{
-		db: db,
+		DB: db,
 	}
 }
 
@@ -35,13 +32,17 @@ func NewDB() (*sql.DB, error) {
 	psqlInfo := fmt.Sprint(c.Conn)
 	fmt.Println(psqlInfo)
 
-	db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
+	db, err := sql.Open("postgres", "host=localhost port=5444 user=root password=root dbname=restaurant sslmode=disable")
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to db: %v\n", err)
 	}
+	//db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
+	//if err != nil {
+	//	return nil, fmt.Errorf("can't connect to db: %v\n", err)
+	//}
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("no ping by db: %v\n", err)
-	}
+	//if err := db.Ping(); err != nil {
+	//	return nil, fmt.Errorf("no ping by db: %v\n", err)
+	//}
 	return db, nil
 }

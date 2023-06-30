@@ -1,16 +1,16 @@
 package serviceR
 
 import (
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"time"
 )
 
-func (su *RestaurantUsecase) CreateMenu() (*pb.Menu, error) {
-	m, err := su.repoR.CreateMenu()
-	return m, err
+func (su *RestaurantUsecase) CreateMenu(mc *types.MenuCreate) error {
+	err := su.repoR.CreateMenu(mc)
+	return err
 }
 
-func (su *RestaurantUsecase) GetMenu(t time.Time) (*pb.Menu, error) {
+func (su *RestaurantUsecase) GetMenu(t time.Time) (*types.Menu, error) {
 	m, err := su.repoR.GetMenu(t)
 	return m, err
 }

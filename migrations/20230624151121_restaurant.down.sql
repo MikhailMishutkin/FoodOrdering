@@ -1,6 +1,0 @@
--- DROP TABLE "orders_on_date";
--- DROP TABLE "order";
--- DROP TABLE "order_by_office";
--- DROP TABLE "menu";
--- DROP TABLE "type";
--- DROP TABLE "product";

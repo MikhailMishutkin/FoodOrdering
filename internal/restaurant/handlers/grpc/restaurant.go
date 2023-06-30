@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"time"
 
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
@@ -19,9 +20,9 @@ func NewRestaurantService(rs RestaurantServicer) *RestaurantService {
 }
 
 type RestaurantServicer interface {
-	CreateProduct([]byte) error
-	GetProductList() ([]byte, error)
-	CreateMenu() (*pb.Menu, error)
-	GetMenu(time.Time) (*pb.Menu, error)
+	CreateProduct(product *types.Product) error
+	GetProductList() ([]*types.Product, error)
+	CreateMenu(create *types.MenuCreate) error
+	GetMenu(time.Time) (*types.Menu, error)
 	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
 }
