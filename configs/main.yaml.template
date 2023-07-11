@@ -1,0 +1,10 @@
+api:
+  host: "localhost:8080"
+  hostgRPC: "localhost:5051"
+
+nats:
+    name: "ORDERS"
+    consumername: "restaurant"
+
+db:
+    conn: "postgresql://root:root@localhost:5432/restaurant?sslmode=disable"

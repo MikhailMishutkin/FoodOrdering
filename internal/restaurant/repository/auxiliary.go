@@ -1,13 +1,7 @@
 package repository
 
 import (
-	"io/ioutil"
-	"log"
 	"time"
-
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
-	"github.com/nats-io/nats.go"
-	"google.golang.org/protobuf/proto"
 )
 
 func DateConv(t time.Time) time.Time {
@@ -19,35 +13,22 @@ func DateConv(t time.Time) time.Time {
 	return tConv
 }
 
-func FromMapToSlice() (sp []*pb.Product) {
-
-	for _, v := range dataMap {
-		p := &pb.Product{}
-		p = v
-		sp = append(sp, p)
-	}
-	gplr := new(pb.GetProductListResponse)
-	gplr.Result = sp
-	out, err := proto.Marshal(gplr)
-	if err != nil {
-		log.Fatalln("Failed to encode product:", err)
-	}
-	if err := ioutil.WriteFile(fileBin, out, 0644); err != nil {
-		log.Fatalln("Failed to write product:", err)
-	}
-
-	return sp
-}
-
-func NatsPublisher() {
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		log.Fatalf("can't connect to NATS: %v", err)
-	}
-	defer nc.Close()
-
-	for {
-		nc.Publish("intros", []byte("Hello1 World!"))
-		time.Sleep(1 * time.Second)
-	}
-}
+//func FromMapToSlice() (sp []*pb.Product) {
+//	var dataMap map[string]*pb.Product //временное при настройке бд
+//	for _, v := range dataMap {
+//		p := &pb.Product{}
+//		p = v
+//		sp = append(sp, p)
+//	}
+//	gplr := new(pb.GetProductListResponse)
+//	gplr.Result = sp
+//	out, err := proto.Marshal(gplr)
+//	if err != nil {
+//		log.Fatalln("Failed to encode product:", err)
+//	}
+//	if err := ioutil.WriteFile(fileBin, out, 0644); err != nil {
+//		log.Fatalln("Failed to write product:", err)
+//	}
+//
+//	return sp
+//}

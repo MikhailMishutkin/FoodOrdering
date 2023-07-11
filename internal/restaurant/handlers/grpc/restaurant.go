@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"time"
 
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
 
 type RestaurantService struct {
@@ -11,17 +12,17 @@ type RestaurantService struct {
 	pb.UnimplementedMenuServiceServer
 	pb.UnimplementedOrderServiceServer
 
-	repoR RestaurantRepository
+	rSer RestaurantServicer
 }
 
-func NewRestaurantService(rp RestaurantRepository) *RestaurantService {
-	return &RestaurantService{repoR: rp}
+func NewRestaurantService(rs RestaurantServicer) *RestaurantService {
+	return &RestaurantService{rSer: rs}
 }
 
-type RestaurantRepository interface {
-	CreateProduct(*pb.Product) error
-	GetProductList() (*pb.GetProductListResponse, error)
-	CreateMenu() (*pb.Menu, error)
-	GetMenu(time.Time) *pb.Menu
+type RestaurantServicer interface {
+	CreateProduct(product *types.Product) error
+	GetProductList() ([]*types.Product, error)
+	CreateMenu(create *types.MenuCreate) error
+	GetMenu(time.Time) (*types.Menu, error)
 	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
 }

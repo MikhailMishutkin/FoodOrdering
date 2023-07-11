@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"github.com/google/uuid"
 )
 
@@ -14,6 +14,12 @@ func init() {
 
 func RandomID() string {
 	return uuid.New().String()
+}
+
+func randomOffice() (string, string) {
+	ofname := randomStringFromSet("Ателье", "Магазин Бум", "Офис Гранд")
+	ofAdr := randomStringFromSet("Гончарова 22, оф. 3", "К. Маркса 5а, оф. 17", "ул. Мира 7, оф. 36")
+	return ofname, ofAdr
 }
 
 func randomProductName(t restaurant.ProductType) string {

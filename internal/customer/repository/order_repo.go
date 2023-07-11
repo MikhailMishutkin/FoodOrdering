@@ -1,60 +1,83 @@
 package cusrepository
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"sync"
-	"time"
-
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
-	"github.com/google/uuid"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"github.com/nats-io/nats.go"
+	"log"
 )
 
-var dataMap map[string]*pb.Product
+// TODO: connect db
+func (cr *CustomerRepo) CreateOrder(order *types.OrderRequest) error {
+	log.Println("CreateOrder repo was invoked")
 
-func init() {
-	dataMap = make(map[string]*pb.Product)
-}
-func RandomID() string {
-	return uuid.New().String()
-}
-
-type CustomerRepo struct {
-	mutex   sync.RWMutex
-	dataMap map[string]*pb.Product
-}
-
-func NewCustomerRepo() *CustomerRepo {
-	return &CustomerRepo{
-		dataMap: dataMap,
-	}
-}
-
-func natsSubscriber() {
 	nc, err := nats.Connect(nats.DefaultURL)
 	if err != nil {
-		log.Fatalf("can't connect to NATS: %v", err)
+		log.Printf("can't connect to NATS: %v", err)
+		return err
 	}
-	defer nc.Close()
+	defer nc.Drain()
 
-	nc.Subscribe("intros", func(m *nats.Msg) {
-		fmt.Println(string(m.Data))
-	})
-	time.Sleep(30 * time.Second)
-
-}
-
-func (cr *CustomerRepo) GetActualMenu(menu *pb.GetActualMenuResponse) {
-	m := dataMap
-	salads := menu.Salads
-	for _, v := range salads {
-		m[v.Uuid] = v
+	data, err := json.Marshal(order)
+	if err != nil {
+		return fmt.Errorf("Can't marshal to bytes: %v\n", err)
 	}
 
-	//go natsSubscriber()
+	msg := &nats.Msg{
+		Subject: "order",
+		Data:    data,
+	}
+	nc.PublishMsg(msg)
+
+	return nil
 }
 
-func (cr *CustomerRepo) CreateOrder() {
+//func processMsg(sub *nats.Subscription) {
 
-}
+//	for sub.IsValid() {
+//		msgs, err := sub.Fetch(1)
+//		if err == nil {
+//			fmt.Printf("INFO - Got reply - %s\n", string(msgs[0].Data))
+//		}
+//	}
+//}
+
+//without db
+//var officeMap map[string]*pb.Office
+
+//func init() {
+//	officeMap = make(map[string]*pb.Office)
+//}
+//func RandomID() string {
+//	return uuid.New().String()
+//}
+
+//with Jetstream
+//conf, err := configs.New("./configs/main.yaml.template")
+//if err != nil {
+//	log.Println("can't load config (repository rest/order: ", err)
+//}
+
+//data, err := proto.Marshal(order)
+//if err != nil {
+//	fmt.Errorf("cannot marshal proto message to binary: %w", err)
+//	return err
+//}
+//js, err := nc.JetStream()
+//	if err != nil {
+//		log.Println("error line 141 app: ", err)
+//	}
+//
+//	js.AddStream(&nats.StreamConfig{
+//		Name:     conf.NATS.Name,
+//		Subjects: []string{"orders"},
+//	})
+//
+//	//conf.Storage = nats.FileStorage?????
+//
+//	ack, err := js.Publish("orders", data)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//	fmt.Println(ack)
