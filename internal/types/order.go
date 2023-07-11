@@ -1,7 +1,7 @@
 package types
 
 type OrderRequest struct {
-	UserUuid  string
+	UserUuid  int
 	Salads    []*OrderItem
 	Garnishes []*OrderItem
 	Meats     []*OrderItem
@@ -11,6 +11,6 @@ type OrderRequest struct {
 }
 
 type OrderItem struct {
-	Count       int32
-	ProductUuid string
+	Count       int
+	ProductUuid int
 }

@@ -7,4 +7,4 @@ nats:
     consumername: "restaurant"
 
 db:
-    conn: "postgresql://root:123@localhost:5432/restaurant?sslmode=disable"
+    conn: "postgresql://root:root@localhost:5432/restaurant?sslmode=disable"

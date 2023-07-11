@@ -22,4 +22,5 @@ type RestaurantRepository interface {
 	CreateMenu(mc *types.MenuCreate) error
 	GetMenu(time.Time) (*types.Menu, error)
 	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
+	GetOrder(order *types.OrderRequest) error
 }

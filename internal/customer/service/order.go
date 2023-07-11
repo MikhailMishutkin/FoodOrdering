@@ -1,31 +1,24 @@
 package service
 
 import (
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"log"
 )
 
-// GetActualMenu from restaurant DB
-func (cu *CustomerUsecase) GetActualMenu(res *restaurant.GetMenuResponse) (amr *pb.GetActualMenuResponse, err error) {
+//// GetActualMenu from restaurant DB
+//func (cu *CustomerUsecase) GetActualMenu(res *types.Menu) (amr *pb.GetActualMenuResponse, err error) {
+//
+//	return amr, nil
+//}
 
-	amr = &pb.GetActualMenuResponse{
-		Salads:    ProductConv(res.Menu.Salads),
-		Garnishes: ProductConv(res.Menu.Garnishes),
-		Meats:     ProductConv(res.Menu.Meats),
-		Soups:     ProductConv(res.Menu.Soups),
-		Drinks:    ProductConv(res.Menu.Drinks),
-		Desserts:  ProductConv(res.Menu.Desserts),
-	}
-
-	return amr, nil
-}
-
-func (cu *CustomerUsecase) CreateOrder(in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+func (cu *CustomerUsecase) CreateOrder(request *types.OrderRequest) error {
 	log.Println("CreateOrder service was invoked")
 
-	err := cu.repoC.CreateOrder(in)
-	return &pb.CreateOrderResponse{}, err
+	err := cu.repoC.CreateOrder(request)
+
+	return err
 }
 
 func ProductConv(p []*restaurant.Product) []*pb.Product {
@@ -44,6 +37,15 @@ func ProductConv(p []*restaurant.Product) []*pb.Product {
 	}
 	return sl
 }
+
+//amr = &pb.GetActualMenuResponse{
+//Salads:    ProductConv(res.Menu.Salads),
+//Garnishes: ProductConv(res.Menu.Garnishes),
+//Meats:     ProductConv(res.Menu.Meats),
+//Soups:     ProductConv(res.Menu.Soups),
+//Drinks:    ProductConv(res.Menu.Drinks),
+//Desserts:  ProductConv(res.Menu.Desserts),
+//}
 
 // m := dataMap
 // salads := menu.Salads

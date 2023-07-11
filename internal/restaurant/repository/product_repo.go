@@ -29,7 +29,7 @@ func (r *RestaurantRepo) GetProductList() ([]*types.Product, error) {
 
 	products, err := r.DB.Query("SELECT * FROM product")
 	if err != nil {
-		return nil, fmt.Errorf("Error to get groupnames from db: %s", err)
+		return nil, fmt.Errorf("Error to get ProductList from db: %s", err)
 
 	}
 	defer products.Close()

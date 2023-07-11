@@ -37,7 +37,7 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	}
 	defer conn.Close()
 
-	repoC := cusrepository.NewCustomerRepo()
+	repoC := cusrepository.NewCustomerRepo(db)
 	cu := service.NewCustomerUsecase(repoC)
 	cs := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 
@@ -113,7 +113,7 @@ func StartGRPC(conf configs.Config) {
 	}
 	defer conn.Close()
 
-	repoC := cusrepository.NewCustomerRepo()
+	repoC := cusrepository.NewCustomerRepo(db)
 	cu := service.NewCustomerUsecase(repoC)
 	n := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 

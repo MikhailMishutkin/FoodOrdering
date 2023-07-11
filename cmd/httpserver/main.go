@@ -1,14 +1,14 @@
 package main
 
 import (
-	"log"
-
 	app "github.com/MikhailMishutkin/FoodOrdering/cmd"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
+	"log"
 )
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 }
 
 func main() {

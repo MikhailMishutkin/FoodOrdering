@@ -1,7 +1,7 @@
 package service
 
 import (
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
 
@@ -22,9 +22,9 @@ func New(client rest.MenuServiceClient) *CustomerUsecase {
 }
 
 type CustomerRepository interface {
-	CreateOffice(office *pb.Office) error
-	GetOfficeList() ([]*pb.Office, error)
-	CreateUser(user *pb.User) error
-	GetUserList(string) (*pb.GetUserListResponse, error)
-	CreateOrder(*pb.CreateOrderRequest) error
+	CreateOffice(office *types.Office) error
+	GetOfficeList() ([]*types.Office, error)
+	CreateUser(user *types.User) error
+	GetUserList(int) ([]*types.User, error)
+	CreateOrder(request *types.OrderRequest) error
 }

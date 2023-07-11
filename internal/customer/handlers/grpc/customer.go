@@ -1,6 +1,7 @@
 package handlers_customer
 
 import (
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
@@ -27,10 +28,10 @@ func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerServ
 }
 
 type CustomerServicer interface {
-	CreateOffice(*pb.Office) error
-	GetOfficeList() ([]*pb.Office, error)
-	CreateUser(*pb.User) error
-	GetUserList(*pb.GetUserListRequest) (*pb.GetUserListResponse, error)
-	GetActualMenu(*restaurant.GetMenuResponse) (*pb.GetActualMenuResponse, error)
-	CreateOrder(*pb.CreateOrderRequest) (*pb.CreateOrderResponse, error)
+	CreateOffice(*types.Office) error
+	GetOfficeList() ([]*types.Office, error)
+	CreateUser(*types.User) error
+	GetUserList(int) ([]*types.User, error)
+	//GetActualMenu(menu *types.Menu) (, error)
+	CreateOrder(request *types.OrderRequest) error
 }

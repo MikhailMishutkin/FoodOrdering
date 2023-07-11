@@ -3,9 +3,7 @@ package gen
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	cus "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	res "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	//"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -48,13 +46,11 @@ func NewProduct(t res.ProductType) *types.Product {
 	return p
 }
 
-func NewOffice() *cus.Office {
+func NewOffice() *types.Office {
 	n, a := randomOffice()
-	return &cus.Office{
-		Uuid:      RandomID(),
-		Name:      n,
-		Address:   a,
-		CreatedAt: timestamppb.Now(),
+	return &types.Office{
+		Name:    n,
+		Address: a,
 	}
 }
 

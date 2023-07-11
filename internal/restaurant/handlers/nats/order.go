@@ -1,5 +1,26 @@
 package natsrestaurant
 
+//import (
+//	"github.com/nats-io/nats.go"
+//	"log"
+//	"time"
+//)
+//
+//func Subscribe() {
+//	nc, err := nats.Connect(nats.DefaultURL)
+//	if err != nil {
+//		log.Fatalf("can't connect to NATS: %v", err)
+//	}
+//	defer nc.Close()
+//
+//	sub, err := nc.SubscribeSync("orders")
+//	msg, _ := sub.NextMsg(10 * time.Hour)
+
+//, func(m *nats.Msg) {
+//	fmt.Println(string(m.Data))
+//})
+//}
+
 //
 //import (
 //	"fmt"

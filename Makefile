@@ -21,4 +21,7 @@ migratedown:
 http:
 	go build -v ./cmd/httpserver
 
-.PHONY: network postgres createdb dropdb migrateup migratedown http
+grpc:
+	go build -v ./cmd/grpcserver
+
+.PHONY: network postgres createdb dropdb migrateup migratedown http grpc
