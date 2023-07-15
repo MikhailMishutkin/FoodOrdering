@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-// TODO: Uuid для пользователя уже из базы, проверка на существование в случае ручного создания
+// TODO: Проверка на существование в случае ручного создания
 func (s *CustomerService) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	log.Println("CreateUser was invoked")
 	ofId, err := strconv.Atoi(in.OfficeUuid)
@@ -52,6 +52,7 @@ func convertUser(res []*types.User) []*pb.User {
 			Uuid:       id,
 			Name:       v.Name,
 			OfficeUuid: ofId,
+			OfficeName: v.OfficeName,
 			CreatedAt:  t,
 		}
 		resPb = append(resPb, pr)

@@ -27,6 +27,10 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
 	}
+	gorm, err := cusrepository.NewGormDB()
+	if err != nil {
+		log.Fatal("cannot connect to gorm: ", err)
+	}
 	repo := repository.NewRestaurantRepo(db)
 	ru := serviceR.NewRestaurantUsecace(repo)
 	rs := handlers.NewRestaurantService(ru)
@@ -37,7 +41,7 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	}
 	defer conn.Close()
 
-	repoC := cusrepository.NewCustomerRepo(db)
+	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
 	cs := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 
@@ -104,6 +108,11 @@ func StartGRPC(conf configs.Config) {
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
 	}
+	gorm, err := cusrepository.NewGormDB()
+	if err != nil {
+		log.Fatal("cannot connect to gorm: ", err)
+	}
+
 	repo := repository.NewRestaurantRepo(db)
 	ru := serviceR.NewRestaurantUsecace(repo)
 	rs := handlers.NewRestaurantService(ru)
@@ -113,7 +122,7 @@ func StartGRPC(conf configs.Config) {
 	}
 	defer conn.Close()
 
-	repoC := cusrepository.NewCustomerRepo(db)
+	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
 	n := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
 

@@ -3,44 +3,43 @@ package cusrepository
 import (
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/gormdb"
 	"log"
 )
 
 func (cr *CustomerRepo) CreateOffice(office *types.Office) error {
 	fmt.Println("Repo CreateOffice was invoked")
-	if err := cr.DB.QueryRow(
-		"INSERT INTO office (name, adress) VALUES ($1, $2) RETURNING uuid",
-		office.Name,
-		office.Address,
-	).Scan(&office.Uuid); err != nil {
-		return err
+
+	gOffice := &gormdb.Office{
+		Name:    office.Name,
+		Address: office.Address,
 	}
 
-	return nil
+	err := cr.DB.Create(gOffice).Error
+	if err != nil {
+		return fmt.Errorf("can't create office in gorm: %v\n", err)
+	}
+	return err
 }
 
 func (cr *CustomerRepo) GetOfficeList() ([]*types.Office, error) {
 	log.Printf("GetOfficeList Repository was invoked")
-	var sl []*types.Office
-
-	offices, err := cr.DB.Query("SELECT * FROM office")
+	officesList := &[]gormdb.Office{}
+	err := cr.DB.Find(officesList).Error
 	if err != nil {
-		return nil, fmt.Errorf("Error to get OfficeList from db: %s", err)
-
+		return nil, fmt.Errorf("can't create office in gorm: %v\n", err)
 	}
-	defer offices.Close()
+	tOffs := []*types.Office{}
 
-	for offices.Next() {
-		tp := &types.Office{}
-		if err = offices.Scan(&tp.Uuid, &tp.Name, &tp.Address, &tp.CreatedAt); err != nil {
-			return nil, fmt.Errorf("trouble with row.Next Officelist: %v\n", err)
-		}
-
-		sl = append(sl, tp)
-
+	for _, v := range *officesList {
+		tOff := &types.Office{}
+		tOff.Uuid = v.ID
+		tOff.Name = v.Name
+		tOff.Address = v.Address
+		tOff.CreatedAt = v.CreatedAt
+		tOffs = append(tOffs, tOff)
 	}
-
-	return sl, err
+	return tOffs, nil
 }
 
 // CreateOffice without db
@@ -84,4 +83,32 @@ func (cr *CustomerRepo) GetOfficeList() ([]*types.Office, error) {
 //err = json.Unmarshal(m, &sl)
 //if err != nil {
 //log.Fatal("cannot unmarshall data office.json", err)
+//}
+
+// with pq driver
+//
+//if err := cr.DB.QueryRow(
+//"INSERT INTO office (name, adress) VALUES ($1, $2) RETURNING uuid",
+//office.Name,
+//office.Address,
+//).Scan(&office.Uuid); err != nil {
+//return err
+//}
+
+//var sl []*types.Office
+//offices, err := cr.DB.Query("SELECT * FROM office")
+//if err != nil {
+//return nil, fmt.Errorf("Error to get OfficeList from db: %s", err)
+//
+//}
+//defer offices.Close()
+//
+//for offices.Next() {
+//tp := &types.Office{}
+//if err = offices.Scan(&tp.Uuid, &tp.Name, &tp.Address, &tp.CreatedAt); err != nil {
+//return nil, fmt.Errorf("trouble with row.Next Officelist: %v\n", err)
+//}
+//
+//sl = append(sl, tp)
+//
 //}
