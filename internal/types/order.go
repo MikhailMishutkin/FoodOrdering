@@ -13,4 +13,12 @@ type OrderRequest struct {
 type OrderItem struct {
 	Count       int
 	ProductUuid int
+	ProductName string
+}
+
+type OrderByOffice struct {
+	OfficeUuid    int
+	OfficeName    string
+	OfficeAddress string
+	Result        []*OrderItem
 }

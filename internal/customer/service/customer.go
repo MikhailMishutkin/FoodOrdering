@@ -8,10 +8,10 @@ import (
 type CustomerUsecase struct {
 	rest.UnimplementedOrderServiceServer
 	client rest.MenuServiceClient
-	repoC  CustomerRepository
+	repoC  CustomerRepositorier
 }
 
-func NewCustomerUsecase(r CustomerRepository) *CustomerUsecase {
+func NewCustomerUsecase(r CustomerRepositorier) *CustomerUsecase {
 	return &CustomerUsecase{repoC: r}
 }
 
@@ -21,7 +21,7 @@ func New(client rest.MenuServiceClient) *CustomerUsecase {
 	}
 }
 
-type CustomerRepository interface {
+type CustomerRepositorier interface {
 	CreateOffice(office *types.Office) error
 	GetOfficeList() ([]*types.Office, error)
 	CreateUser(user *types.User) error

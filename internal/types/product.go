@@ -11,3 +11,10 @@ type Product struct {
 	Price     float64
 	CreatedAt time.Time
 }
+
+type StatProduct struct {
+	Uuid  int
+	Name  string
+	Count int
+	Type  int
+}

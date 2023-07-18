@@ -7,7 +7,9 @@ import (
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
 )
 
-//import "github.com/MikhailMishutkin/FoodOrdering/cmd/customer/customer_app"
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
 
 func main() {
 	conf, err := configs.New("./configs/main.yaml.template")

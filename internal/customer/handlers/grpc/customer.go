@@ -1,4 +1,4 @@
-package handlers_customer
+package handlerscustomer
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"

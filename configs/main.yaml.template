@@ -3,8 +3,8 @@ api:
   hostgRPC: "localhost:5051"
 
 nats:
-    name: "ORDERS"
+    name: "order"
     consumername: "restaurant"
 
 db:
-    conn: "postgresql://root:root@localhost:5432/restaurant?sslmode=disable"
+    conn: "postgresql://root:root@localhost:5444/restaurant?sslmode=disable"

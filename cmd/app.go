@@ -3,14 +3,18 @@ package app
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
-	handlers_customer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/grpc"
+	handlerscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/grpc"
 	cusrepository "github.com/MikhailMishutkin/FoodOrdering/internal/customer/repository"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/customer/service"
 	handlers "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/handlers/grpc"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
 	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service"
+	stathandlers "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/handlers/grpc"
+	statrepository "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/repository"
+	statservice "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/service"
 	cust "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/statistics"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc/credentials/insecure"
@@ -31,9 +35,6 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	if err != nil {
 		log.Fatal("cannot connect to gorm: ", err)
 	}
-	repo := repository.NewRestaurantRepo(db)
-	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru)
 
 	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -41,9 +42,20 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	}
 	defer conn.Close()
 
+	//restaurant
+	repo := repository.NewRestaurantRepo(db)
+	ru := serviceR.NewRestaurantUsecace(repo)
+	rs := handlers.NewRestaurantService(ru, cust.NewOfficeServiceClient(conn), cust.NewUserServiceClient(conn))
+
+	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
-	cs := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
+	cs := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
+
+	//statistic
+	repoS := statrepository.NewStatRepo(db)
+	su := statservice.NewStatUsecase(repoS)
+	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
 
 	s := grpc.NewServer()
 
@@ -53,11 +65,13 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	rest.RegisterProductServiceServer(s, &handlers.RestaurantService{})
 	rest.RegisterMenuServiceServer(s, &handlers.RestaurantService{})
 	rest.RegisterOrderServiceServer(s, &handlers.RestaurantService{})
-	cust.RegisterOrderServiceServer(s, &handlers_customer.CustomerService{})
-	cust.RegisterOfficeServiceServer(s, &handlers_customer.CustomerService{})
-	cust.RegisterUserServiceServer(s, &handlers_customer.CustomerService{})
+	cust.RegisterOrderServiceServer(s, &handlerscustomer.CustomerService{})
+	cust.RegisterOfficeServiceServer(s, &handlerscustomer.CustomerService{})
+	cust.RegisterUserServiceServer(s, &handlerscustomer.CustomerService{})
+	statistics.RegisterStatisticsServiceServer(s, &stathandlers.StatisticService{})
 
 	router := runtime.NewServeMux()
+
 	err = rest.RegisterProductServiceHandlerServer(ctx, router, rs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
@@ -83,6 +97,11 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	}
 
 	err = cust.RegisterUserServiceHandlerServer(ctx, router, cs)
+	if err != nil {
+		log.Printf("Failed to register gateway: %v\n", err)
+	}
+
+	err = statistics.RegisterStatisticsServiceHandlerServer(ctx, router, sh)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
@@ -113,25 +132,35 @@ func StartGRPC(conf configs.Config) {
 		log.Fatal("cannot connect to gorm: ", err)
 	}
 
-	repo := repository.NewRestaurantRepo(db)
-	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru)
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v\n", err)
 	}
 	defer conn.Close()
 
+	//restaurant
+	repo := repository.NewRestaurantRepo(db)
+	ru := serviceR.NewRestaurantUsecace(repo)
+	rs := handlers.NewRestaurantService(ru, cust.NewOfficeServiceClient(conn), cust.NewUserServiceClient(conn))
+
+	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
-	n := handlers_customer.New(rest.NewMenuServiceClient(conn), cu)
+	n := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
+
+	//statistic
+	repoS := statrepository.NewStatRepo(db)
+	su := statservice.NewStatUsecase(repoS)
+	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
 
 	s := grpc.NewServer()
 
 	rest.RegisterMenuServiceServer(s, rs)
-
+	rest.RegisterProductServiceServer(s, rs)
 	cust.RegisterOrderServiceServer(s, n)
-
+	cust.RegisterOfficeServiceServer(s, n) // n - &handlers_customer.CustomerService{}
+	cust.RegisterUserServiceServer(s, n)   // n - &handlers_customer.CustomerService{}
+	statistics.RegisterStatisticsServiceServer(s, sh)
 	lis, err := net.Listen("tcp", conf.API.GHost)
 	if err != nil {
 		log.Fatalf("Failed to listen on: %v\n", err)

@@ -4,13 +4,10 @@ import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"log"
-	"strconv"
-
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 )
 
 // generated 12 products by package gen if name == ""
@@ -55,44 +52,4 @@ func (s *RestaurantService) GetProductList(ctx context.Context, in *pb.GetProduc
 	}
 
 	return response, nil
-}
-
-func enumSelect(i int) pb.ProductType {
-	switch i {
-	case 1:
-		return pb.ProductType_PRODUCT_TYPE_SALAD
-	case 2:
-		return pb.ProductType_PRODUCT_TYPE_GARNISH
-	case 3:
-		return pb.ProductType_PRODUCT_TYPE_MEAT
-	case 4:
-		return pb.ProductType_PRODUCT_TYPE_SOUP
-	case 5:
-		return pb.ProductType_PRODUCT_TYPE_DRINK
-	case 6:
-		return pb.ProductType_PRODUCT_TYPE_DESSERT
-	default:
-		return pb.ProductType_PRODUCT_TYPE_UNSPECIFIED
-	}
-
-}
-
-func convertProducts(res []*types.Product) []*pb.Product {
-	var resPb []*pb.Product
-
-	for _, v := range res {
-		id := strconv.Itoa(v.Uuid)
-		t := timestamppb.New(v.CreatedAt)
-		pr := &pb.Product{
-			Uuid:        id,
-			Name:        v.Name,
-			Description: v.Descript,
-			Type:        enumSelect(v.Type),
-			Weight:      int32(v.Weight),
-			Price:       v.Price,
-			CreatedAt:   t,
-		}
-		resPb = append(resPb, pr)
-	}
-	return resPb
 }

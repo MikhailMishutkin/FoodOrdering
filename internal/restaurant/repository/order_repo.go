@@ -1,17 +1,113 @@
 package repository
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	pbr "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"log"
+	"time"
 )
 
 // TODO: ошибки!!!!
-func (r *RestaurantRepo) GetOrderList() ([]*pbr.Order, []*pbr.OrdersByOffice) {
+func (r *RestaurantRepo) GetOrderList(
+	date time.Time,
+	offices []*types.Office,
+	users []*types.User,
+) (
+	[]*types.OrderItem,
+	[]*types.OrderByOffice,
+	error,
+) {
 
-	return nil, nil
+	log.Println("GetOrderList repository was invoked")
+	//slice of OrderItem
+	q := `SELECT  O.product_id, (SELECT name FROM product WHERE uuid = O.product_id), SUM(O.count) AS total
+FROM orders AS O
+WHERE O.on_date = $1
+GROUP BY O.product_id`
+
+	rows, err := r.DB.Query(q, date)
+	if err != nil {
+		return nil, nil, fmt.Errorf("30: %v\n", err) //TODO
+	}
+
+	slOI := []*types.OrderItem{}
+	for rows.Next() {
+		order := &types.OrderItem{}
+		if err := rows.Scan(
+			&order.ProductUuid,
+			&order.ProductName,
+			&order.Count,
+		); err != nil {
+			fmt.Errorf("trouble with rows.Next (GetOrderList Restaurant): %s", err)
+		}
+		slOI = append(slOI, order)
+	}
+	// write offices to db
+	for _, v := range offices {
+		q = `INSERT INTO office  (id, office_name, office_address) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`
+		_, err = r.DB.Exec(q,
+			v.Uuid,
+			v.Name,
+			v.Address,
+		)
+		if err != nil {
+			fmt.Errorf("54: %v\n", err)
+
+		}
+	}
+	//write users to db
+	for _, v := range users {
+		q = `INSERT INTO users (id, user_name, office_uuid) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`
+		_, err = r.DB.Exec(q,
+			v.Uuid,
+			v.Name,
+			v.OfficeUuid,
+		)
+		if err != nil {
+			fmt.Errorf("67: %v\n", err)
+
+		}
+	}
+
+	//slice of OrdersByCompany
+	rows1, err := r.DB.Query("SELECT * FROM office")
+	if err != nil {
+		fmt.Errorf("can't get offices from db in GetOrderList repository: %v\n", err)
+	}
+	slOrderByOffice := []*types.OrderByOffice{}
+	for rows1.Next() {
+		office := &types.OrderByOffice{}
+		if err = rows1.Scan(&office.OfficeUuid, &office.OfficeName, &office.OfficeAddress); err != nil {
+			fmt.Errorf(
+				`trouble with rows.Next (GetOrderList Restaurant repo,
+						for slice of OrdersByCompany): %v`,
+				err,
+			)
+		}
+		q1 := `SELECT O.product_id, (SELECT name FROM product WHERE uuid = O.product_id), SUM(O.count) AS total
+				FROM orders AS O
+				WHERE O.on_date = $1 and O.user_uuid IN (SELECT id
+                                                  FROM users
+                                                  WHERE office_uuid = $2)
+				GROUP BY O.product_id`
+		rows2, err := r.DB.Query(q1, date, office.OfficeUuid)
+		if err != nil {
+			return nil, nil, fmt.Errorf("87: %v\n", err)
+		}
+		slOrderItemByOffice := []*types.OrderItem{}
+		for rows2.Next() {
+			oI := &types.OrderItem{}
+			if err = rows2.Scan(&oI.ProductUuid, &oI.ProductName, &oI.Count); err != nil {
+				return nil, nil, fmt.Errorf("93: %v\n", err)
+			}
+			slOrderItemByOffice = append(slOrderItemByOffice, oI)
+		}
+		office.Result = slOrderItemByOffice
+		slOrderByOffice = append(slOrderByOffice, office)
+
+	}
+
+	return slOI, slOrderByOffice, err
 }
 
 func (r *RestaurantRepo) GetOrder(order *types.OrderRequest) error {
@@ -27,8 +123,8 @@ func (r *RestaurantRepo) GetOrder(order *types.OrderRequest) error {
 	slOI = append(slOI, order.Desserts...)
 
 	for _, v := range slOI {
-		res2B, _ := json.Marshal(v)
-		fmt.Println(string(res2B))
+		//res2B, _ := json.Marshal(v)
+		//fmt.Println(string(res2B))
 		if v.Count != 0 && v.ProductUuid != 0 {
 			_, err := r.DB.Exec(
 				"INSERT INTO orders (user_uuid, product_id, count) VALUES ($1, $2, $3)",
@@ -43,6 +139,42 @@ func (r *RestaurantRepo) GetOrder(order *types.OrderRequest) error {
 	}
 	return nil
 }
+
+//q = `SELECT user_uuid
+//FROM orders
+//WHERE user_uuid = (SELECT id FROM users WHERE users.office_uuid = $1) and on_date = $2`
+//rows1, err := r.DB.Query(q, office.OfficeUuid, date)
+//if err != nil {
+//	return nil, nil, err
+//}
+//for rows1.Next() {
+//	var id, f int
+//	if err = rows.Scan(&id); err != nil {
+//		return nil, nil, err
+//	}
+//	if id == f {
+//		q = `SELECT O.product_id, (SELECT name FROM product WHERE uuid = O.product_id), SUM(O.count) AS total
+//		FROM orders AS O
+//		WHERE O.on_date = $1 AND O.user_uuid = $2
+//		GROUP BY O.product_id`
+//		rows2, err := r.DB.Query(q, date, id)
+//		if err != nil {
+//			return nil, nil, err
+//		}
+//		for rows2.Next(){
+//			if err =rows2.Scan(&)
+//		}
+//	} else {
+//		continue
+//	}
+//
+//	f = id
+//}
+//
+//SELECT office.id, u.id
+//FROM office
+//JOIN users AS u
+//on office.id = u.office_uuid;
 
 //	log.Println("restaurant subscriber")
 //	config, err := configs.New("./configs/main.yaml.template")

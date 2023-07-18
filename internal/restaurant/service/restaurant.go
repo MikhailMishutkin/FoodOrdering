@@ -2,25 +2,24 @@ package serviceR
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"time"
 )
 
 type RestaurantUsecase struct {
-	repoR RestaurantRepository
+	repoR RestaurantRepositorier
 }
 
-func NewRestaurantUsecace(rr RestaurantRepository) *RestaurantUsecase {
+func NewRestaurantUsecace(rr RestaurantRepositorier) *RestaurantUsecase {
 	return &RestaurantUsecase{
 		repoR: rr,
 	}
 }
 
-type RestaurantRepository interface {
+type RestaurantRepositorier interface {
 	CreateProduct(product *types.Product) error
 	GetProductList() ([]*types.Product, error)
 	CreateMenu(mc *types.MenuCreate) error
 	GetMenu(time.Time) (*types.Menu, error)
-	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
+	GetOrderList(time.Time, []*types.Office, []*types.User) ([]*types.OrderItem, []*types.OrderByOffice, error)
 	GetOrder(order *types.OrderRequest) error
 }

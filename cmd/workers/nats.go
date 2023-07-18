@@ -20,6 +20,7 @@ func main() {
 	repo := &repository.RestaurantRepo{
 		DB: db,
 	}
+
 	nc, err := nats.Connect(nats.DefaultURL)
 	if err != nil {
 		log.Fatalf("can't connect to NATS: %v", err)

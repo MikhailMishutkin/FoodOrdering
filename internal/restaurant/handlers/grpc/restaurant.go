@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
 	"time"
 
 	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
@@ -12,11 +13,21 @@ type RestaurantService struct {
 	pb.UnimplementedMenuServiceServer
 	pb.UnimplementedOrderServiceServer
 
-	rSer RestaurantServicer
+	rSer      RestaurantServicer
+	OffClient customer.OfficeServiceClient
+	UsClient  customer.UserServiceClient
 }
 
-func NewRestaurantService(rs RestaurantServicer) *RestaurantService {
-	return &RestaurantService{rSer: rs}
+func NewRestaurantService(
+	rs RestaurantServicer,
+	OffClient customer.OfficeServiceClient,
+	UsClient customer.UserServiceClient,
+) *RestaurantService {
+	return &RestaurantService{
+		rSer:      rs,
+		OffClient: OffClient,
+		UsClient:  UsClient,
+	}
 }
 
 type RestaurantServicer interface {
@@ -24,5 +35,5 @@ type RestaurantServicer interface {
 	GetProductList() ([]*types.Product, error)
 	CreateMenu(create *types.MenuCreate) error
 	GetMenu(time.Time) (*types.Menu, error)
-	GetOrderList() ([]*pb.Order, []*pb.OrdersByOffice)
+	GetOrderList([]*types.Office, []*types.User) ([]*types.OrderItem, []*types.OrderByOffice, error)
 }

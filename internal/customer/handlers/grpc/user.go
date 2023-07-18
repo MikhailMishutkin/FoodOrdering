@@ -1,4 +1,4 @@
-package handlers_customer
+package handlerscustomer
 
 import (
 	"context"

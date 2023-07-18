@@ -9,7 +9,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"strconv"
-	"time"
 )
 
 func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuRequest) (*pb.CreateMenuResponse, error) {
@@ -65,10 +64,6 @@ func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) 
 	resp.Menu = rm
 
 	return resp, nil
-}
-
-func timeAssert(ts *timestamppb.Timestamp) time.Time {
-	return time.Unix(ts.Seconds, int64(ts.Nanos))
 }
 
 // without db
