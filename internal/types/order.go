@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type OrderRequest struct {
 	UserUuid  int
 	Salads    []*OrderItem
@@ -11,8 +13,10 @@ type OrderRequest struct {
 }
 
 type OrderItem struct {
-	Count       int
-	ProductUuid int
+	ID          int       `db:"id"'`
+	OnDate      time.Time `db:"on_date"`
+	ProductUuid int       `db:"product_id"'`
+	Count       int       `db:"count"`
 	ProductName string
 }
 

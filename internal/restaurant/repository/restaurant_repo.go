@@ -6,6 +6,7 @@ import (
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
+	//_ "github.com/jackc/pgx"
 )
 
 //var dataMap map[string]*pb.Product
@@ -36,13 +37,15 @@ func NewDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to db: %v\n", err)
 	}
-	//db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
-	//if err != nil {
-	//	return nil, fmt.Errorf("can't connect to db: %v\n", err)
-	//}
 
-	//if err := db.Ping(); err != nil {
-	//	return nil, fmt.Errorf("no ping by db: %v\n", err)
-	//}
 	return db, nil
 }
+
+//db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
+//if err != nil {
+//	return nil, fmt.Errorf("can't connect to db: %v\n", err)
+//}
+
+//if err := db.Ping(); err != nil {
+//	return nil, fmt.Errorf("no ping by db: %v\n", err)
+//}

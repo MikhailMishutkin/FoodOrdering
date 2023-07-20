@@ -20,3 +20,13 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
       POSTGRES_DB: customer
+  test-statistics:
+    container_name: statistics-db
+    image: postgres
+    restart: always
+    ports:
+      - "5446:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: statistics

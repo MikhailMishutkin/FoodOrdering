@@ -17,6 +17,8 @@ func NewStatUsecase(sr StatisticRepositorier) *StatisticUsecase {
 }
 
 type StatisticRepositorier interface {
-	ProfitRepo(time.Time, time.Time, []*types.Product) (float64, error)
+	ProfitRepo(context.Context, time.Time, time.Time) (float64, error)
 	TopProductsRepo(context.Context, time.Time, time.Time, int) ([]*types.StatProduct, error)
+	GetProductsRepo([]*types.Product) error
+	GetOrdersRepo(*types.OrderRequest) error
 }

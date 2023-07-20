@@ -27,6 +27,7 @@ import (
 )
 
 func StartGRPCAndHTTPServer(conf configs.Config) error {
+	//connections to databases: pgx, gorm, sqlx
 	db, err := repository.NewDB()
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
@@ -36,6 +37,12 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 		log.Fatal("cannot connect to gorm: ", err)
 	}
 
+	dbx, err := statrepository.NewDB()
+	if err != nil {
+		log.Fatal("cannot connect to db on sqlx: ", err)
+	}
+
+	//connection to grpc
 	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v\n", err)
@@ -53,7 +60,7 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	cs := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
 
 	//statistic
-	repoS := statrepository.NewStatRepo(db)
+	repoS := statrepository.NewStatRepo(dbx)
 	su := statservice.NewStatUsecase(repoS)
 	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
 
@@ -123,6 +130,7 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 }
 
 func StartGRPC(conf configs.Config) {
+	//connections to databases: pgx, gorm, sqlx
 	db, err := repository.NewDB()
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
@@ -132,6 +140,12 @@ func StartGRPC(conf configs.Config) {
 		log.Fatal("cannot connect to gorm: ", err)
 	}
 
+	dbx, err := statrepository.NewDB()
+	if err != nil {
+		log.Fatal("cannot connect to db on sqlx: ", err)
+	}
+
+	//connection to grpc
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v\n", err)
@@ -149,7 +163,7 @@ func StartGRPC(conf configs.Config) {
 	n := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
 
 	//statistic
-	repoS := statrepository.NewStatRepo(db)
+	repoS := statrepository.NewStatRepo(dbx)
 	su := statservice.NewStatUsecase(repoS)
 	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
 

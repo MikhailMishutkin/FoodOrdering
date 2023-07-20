@@ -3,13 +3,13 @@ package types
 import "time"
 
 type Product struct {
-	Uuid      int
-	Name      string
-	Descript  string
-	Type      int
-	Weight    int
-	Price     float64
-	CreatedAt time.Time
+	Uuid      int       `db:"id"`
+	Name      string    `db:"name"`
+	Descript  string    `db:"descr"`
+	Type      int       `db:"type"`
+	Weight    int       `db:"weight"`
+	Price     float64   `db:"price"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type StatProduct struct {

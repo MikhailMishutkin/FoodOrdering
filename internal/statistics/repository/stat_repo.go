@@ -1,7 +1,10 @@
 package statrepository
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
+	//_ "github.com/jackc/pgx"
+	_ "github.com/lib/pq"
 )
 
 type StatRepo struct {
@@ -15,5 +18,12 @@ func NewStatRepo(db *sqlx.DB) *StatRepo {
 }
 
 func NewDB() (*sqlx.DB, error) {
-	return nil, nil
+	db, err := sqlx.Connect(
+		"postgres",
+		"host=localhost port=5446 user=root password=root dbname=statistics sslmode=disable",
+	)
+	if err != nil {
+		return nil, fmt.Errorf("can't connect to db statistcs: %v\n", err)
+	}
+	return db, err
 }

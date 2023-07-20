@@ -24,7 +24,7 @@ func (s StatisticService) TopProducts(
 	end := timeAssert(in.EndDate)
 	prType := int(in.GetProductType())
 
-	res, err := s.ss.TopProducts(ctx, start, end, prType)
+	res, err := s.SS.TopProducts(ctx, start, end, prType)
 	if err != nil {
 		code := codes.Internal
 		return nil, status.Errorf(code, "TopProducts went down witn error, cannot save products in db: %v\n", err)
@@ -51,7 +51,7 @@ func convertToRestProd(result []*types.StatProduct) (stResult []*statistics.Prod
 func enumSelect(i int) statistics.StatisticsProductType {
 	switch i {
 	case 1:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_UNSPECIFIED
+		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_SALAD
 	case 2:
 		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_GARNISH
 	case 3:

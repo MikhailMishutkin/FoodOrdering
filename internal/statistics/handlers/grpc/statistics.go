@@ -11,18 +11,27 @@ import (
 type StatisticService struct {
 	statistics.UnimplementedStatisticsServiceServer
 
-	client restaurant.ProductServiceClient
-	ss     StatisticServicer
+	//ClientOrder   restaurant.OrderServiceClient
+	ClientProduct restaurant.ProductServiceClient
+	SS            StatisticServicer
+	//Sb            StatisticBroker
 }
 
-func NewStatService(client restaurant.ProductServiceClient, ss StatisticServicer) *StatisticService {
+func NewStatService(clientProduct restaurant.ProductServiceClient, ss StatisticServicer) *StatisticService {
 	return &StatisticService{
-		client: client,
-		ss:     ss,
+		//ClientOrder:   clientOrder,
+		ClientProduct: clientProduct,
+		SS:            ss,
 	}
 }
 
 type StatisticServicer interface {
-	Profit(time.Time, time.Time, []*types.Product) (float64, error)
+	Profit(context.Context, time.Time, time.Time) (float64, error)
 	TopProducts(context.Context, time.Time, time.Time, int) ([]*types.StatProduct, error)
+	GetProducts([]*types.Product) error
+	GetOrders(*types.OrderRequest) error
 }
+
+//type StatisticBroker interface {
+//
+//}

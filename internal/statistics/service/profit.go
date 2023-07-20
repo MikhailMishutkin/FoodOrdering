@@ -1,18 +1,19 @@
 package statservice
 
 import (
-	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"context"
 	"log"
 	"time"
 )
 
 func (s *StatisticUsecase) Profit(
+	ctx context.Context,
 	start time.Time,
 	end time.Time,
-	products []*types.Product) (float64, error) {
+) (float64, error) {
 
 	log.Println("Profit service was invoked")
 
-	profit, err := s.sr.ProfitRepo(start, end, products)
+	profit, err := s.sr.ProfitRepo(ctx, start, end)
 	return profit, err
 }

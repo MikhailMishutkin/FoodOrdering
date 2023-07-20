@@ -6,8 +6,6 @@ import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/statistics"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
 	"time"
@@ -23,20 +21,7 @@ func (s StatisticService) GetAmountOfProfit(
 	start := timeAssert(in.StartDate)
 	end := timeAssert(in.EndDate)
 
-	//call restaurant ProductList
-	resProducts, err := s.client.GetProductList(context.Background(), &restaurant.GetProductListRequest{})
-	if err != nil {
-		code := codes.Internal
-		return nil, status.Errorf(code, "GetProductList calling by Stat.Profit went down witn error, cannot save products in db: %v\n", err)
-	}
-
-	products, err := convertToTProduct(resProducts.Result)
-	if err != nil {
-		code := codes.Internal
-		return nil, status.Errorf(code, "convertToProduct went down witn error, cannot save products in db: %v\n", err)
-	}
-
-	profit, err := s.ss.Profit(start, end, products)
+	profit, err := s.SS.Profit(ctx, start, end)
 	return &statistics.GetAmountOfProfitResponse{
 		Profit: profit,
 	}, err
