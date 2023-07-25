@@ -11,15 +11,12 @@ import (
 type StatisticService struct {
 	statistics.UnimplementedStatisticsServiceServer
 
-	//ClientOrder   restaurant.OrderServiceClient
 	ClientProduct restaurant.ProductServiceClient
 	SS            StatisticServicer
-	//Sb            StatisticBroker
 }
 
 func NewStatService(clientProduct restaurant.ProductServiceClient, ss StatisticServicer) *StatisticService {
 	return &StatisticService{
-		//ClientOrder:   clientOrder,
 		ClientProduct: clientProduct,
 		SS:            ss,
 	}
@@ -31,7 +28,3 @@ type StatisticServicer interface {
 	GetProducts([]*types.Product) error
 	GetOrders(*types.OrderRequest) error
 }
-
-//type StatisticBroker interface {
-//
-//}

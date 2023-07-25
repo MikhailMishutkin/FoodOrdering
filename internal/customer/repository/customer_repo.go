@@ -39,13 +39,6 @@ func NewGormDB() (*gorm.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
-	//if err != nil {
-	//	return nil, fmt.Errorf("can't connect to db: %v\n", err)
-	//}
 
-	//if err := db.Ping(); err != nil {
-	//	return nil, fmt.Errorf("no ping by db: %v\n", err)
-	//}
 	return db, nil
 }

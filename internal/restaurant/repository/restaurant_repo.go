@@ -9,15 +9,12 @@ import (
 	//_ "github.com/jackc/pgx"
 )
 
-//var dataMap map[string]*pb.Product
-
 func RandomID() string {
 	return uuid.New().String()
 }
 
 type RestaurantRepo struct {
 	DB *sql.DB
-	//dataMap map[string]*pb.Product
 }
 
 func NewRestaurantRepo(db *sql.DB) *RestaurantRepo {
@@ -40,12 +37,3 @@ func NewDB() (*sql.DB, error) {
 
 	return db, nil
 }
-
-//db, err := sql.Open("postgres", "user=root password=123 dbname=restaurant sslmode=disable")
-//if err != nil {
-//	return nil, fmt.Errorf("can't connect to db: %v\n", err)
-//}
-
-//if err := db.Ping(); err != nil {
-//	return nil, fmt.Errorf("no ping by db: %v\n", err)
-//}

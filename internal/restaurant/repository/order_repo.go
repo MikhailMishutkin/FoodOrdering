@@ -27,7 +27,7 @@ GROUP BY O.product_id`
 
 	rows, err := r.DB.Query(q, date)
 	if err != nil {
-		return nil, nil, fmt.Errorf("30: %v\n", err) //TODO
+		return nil, nil, fmt.Errorf("Error while select items for slice of OrderItem (GetOrderList): %v\n", err) //TODO
 	}
 
 	slOI := []*types.OrderItem{}
@@ -38,7 +38,7 @@ GROUP BY O.product_id`
 			&order.ProductName,
 			&order.Count,
 		); err != nil {
-			fmt.Errorf("trouble with rows.Next (GetOrderList Restaurant): %s", err)
+			fmt.Errorf("Something wrong with rows.Scan while scanning OrderItem for TotalOrders in GetOrderList: %s", err)
 		}
 		slOI = append(slOI, order)
 	}
@@ -51,7 +51,7 @@ GROUP BY O.product_id`
 			v.Address,
 		)
 		if err != nil {
-			fmt.Errorf("54: %v\n", err)
+			fmt.Errorf("Can't insert into db offices data (GetOrderList): %v\n", err)
 
 		}
 	}
@@ -64,7 +64,7 @@ GROUP BY O.product_id`
 			v.OfficeUuid,
 		)
 		if err != nil {
-			fmt.Errorf("67: %v\n", err)
+			fmt.Errorf("Can't insert into db users data (GetOrderList): %v\n", err)
 
 		}
 	}
@@ -79,7 +79,7 @@ GROUP BY O.product_id`
 		office := &types.OrderByOffice{}
 		if err = rows1.Scan(&office.OfficeUuid, &office.OfficeName, &office.OfficeAddress); err != nil {
 			fmt.Errorf(
-				`trouble with rows.Next (GetOrderList Restaurant repo,
+				`trouble with rows1.Scan (GetOrderList Restaurant repo,
 						for slice of OrdersByCompany): %v`,
 				err,
 			)
@@ -92,13 +92,13 @@ GROUP BY O.product_id`
 				GROUP BY O.product_id`
 		rows2, err := r.DB.Query(q1, date, office.OfficeUuid)
 		if err != nil {
-			return nil, nil, fmt.Errorf("87: %v\n", err)
+			return nil, nil, fmt.Errorf("Error with select from db summ of product by office (GetOrderList): %v\n", err)
 		}
 		slOrderItemByOffice := []*types.OrderItem{}
 		for rows2.Next() {
 			oI := &types.OrderItem{}
 			if err = rows2.Scan(&oI.ProductUuid, &oI.ProductName, &oI.Count); err != nil {
-				return nil, nil, fmt.Errorf("93: %v\n", err)
+				return nil, nil, fmt.Errorf("Something wrong with rows2.Scan while scanning OrderItem for OrdersByCompany (GetOrderList): %v\n", err)
 			}
 			slOrderItemByOffice = append(slOrderItemByOffice, oI)
 		}

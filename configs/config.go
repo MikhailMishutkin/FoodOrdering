@@ -13,14 +13,12 @@ type Config struct {
 	API  API  `yaml:"api"`
 	DB   DB   `yaml:"db"`
 	NATS NATS `yaml:"nats"`
-	// FileStorage FileStorage `yaml:"file_storage"`
 }
 
 type (
 	API struct {
 		Host  string `yaml:"host"`
 		GHost string `yaml:"hostgRPC"`
-		//UploadSize int64  `yaml:"upload_size"`
 	}
 
 	DB struct {
@@ -28,13 +26,9 @@ type (
 	}
 
 	NATS struct {
-		Name string `yaml:"name",json:"name"`
-		//	Subjects []string `yaml:"subjects",json:"subjects,omitempty"`
+		Name     string `yaml:"name",json:"name"`
 		Consumer string `yaml:"consumername",json:"consumername"`
 	}
-	// FileStorage struct {
-	// 	Dir string `yaml:"dir"`
-	// }
 )
 
 func New(path string) (config Config, err error) {
@@ -51,25 +45,3 @@ func New(path string) (config Config, err error) {
 		"decode config information",
 	)
 }
-
-// import "os"
-
-// type Config struct {
-// 	BindAddr string
-// 	Host     string
-// 	Port     string
-// 	User     string
-// 	Password string
-// 	NameDB   string
-// }
-
-// func NewConfig() *Config {
-// 	return &Config{
-// 		BindAddr: os.Getenv("BindAddr"),
-// 		Host:     os.Getenv("Host"),
-// 		Port:     os.Getenv("Port"),
-// 		User:     os.Getenv("User"),
-// 		Password: os.Getenv("Password"),
-// 		NameDB:   os.Getenv("NameDB"),
-// 	}
-// }

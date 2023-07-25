@@ -36,5 +36,4 @@ type RestaurantServicer interface {
 	CreateMenu(create *types.MenuCreate) error
 	GetMenu(time.Time) (*types.Menu, error)
 	GetOrderList([]*types.Office, []*types.User) ([]*types.OrderItem, []*types.OrderByOffice, error)
-	//GetOrder(order *types.OrderRequest) error
 }

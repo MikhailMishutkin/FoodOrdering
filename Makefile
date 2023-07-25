@@ -1,4 +1,6 @@
-DB_URL=postgresql://root:123@localhost:5432/restaurant?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5444/restaurant?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5445/customer?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5446/statistics?sslmode=disable
 
 network:
 	docker network create foodordering-network
@@ -24,4 +26,7 @@ http:
 grpc:
 	go build -v ./cmd/grpcserver
 
-.PHONY: network postgres createdb dropdb migrateup migratedown http grpc
+nats:
+	nats-server
+
+.PHONY: network postgres createdb dropdb migrateup migratedown http grpc nats

@@ -65,12 +65,3 @@ func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) 
 
 	return resp, nil
 }
-
-// without db
-//file, err := os.OpenFile("menu.json", os.O_APPEND|os.O_WRONLY, 0644)
-//if err != nil {
-//fmt.Println(err)
-//}
-//defer file.Close()
-//j, _ := json.Marshal(res)
-//file.Write(j)

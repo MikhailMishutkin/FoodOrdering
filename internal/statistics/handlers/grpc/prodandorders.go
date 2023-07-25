@@ -9,7 +9,6 @@ import (
 )
 
 func (s *StatisticService) GetProduct() error {
-	//call restaurant ProductList
 	resProducts, err := s.ClientProduct.GetProductList(context.Background(), &restaurant.GetProductListRequest{})
 	if err != nil {
 		code := codes.Internal

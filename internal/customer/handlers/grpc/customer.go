@@ -15,10 +15,6 @@ type CustomerService struct {
 	cs     CustomerServicer
 }
 
-//func NewCustomerService(cs CustomerServicer) *CustomerService {
-//	return &CustomerService{cs: cs}
-//}
-
 func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerService {
 	//fmt.Println("функция нью пакета хандлерс_кастомер: ", &client)
 	return &CustomerService{
@@ -32,6 +28,5 @@ type CustomerServicer interface {
 	GetOfficeList() ([]*types.Office, error)
 	CreateUser(*types.User) error
 	GetUserList(int) ([]*types.User, error)
-	//GetActualMenu(menu *types.Menu) (, error)
 	CreateOrder(request *types.OrderRequest) error
 }

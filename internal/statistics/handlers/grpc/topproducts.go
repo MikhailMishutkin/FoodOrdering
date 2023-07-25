@@ -27,7 +27,7 @@ func (s StatisticService) TopProducts(
 	res, err := s.SS.TopProducts(ctx, start, end, prType)
 	if err != nil {
 		code := codes.Internal
-		return nil, status.Errorf(code, "TopProducts went down witn error, cannot save products in db: %v\n", err)
+		return nil, status.Errorf(code, "%v\n", err)
 	}
 
 	return &statistics.TopProductsResponse{

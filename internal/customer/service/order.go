@@ -7,12 +7,6 @@ import (
 	"log"
 )
 
-//// GetActualMenu from restaurant DB
-//func (cu *CustomerUsecase) GetActualMenu(res *types.Menu) (amr *pb.GetActualMenuResponse, err error) {
-//
-//	return amr, nil
-//}
-
 func (cu *CustomerUsecase) CreateOrder(request *types.OrderRequest) error {
 	log.Println("CreateOrder service was invoked")
 
@@ -37,20 +31,3 @@ func ProductConv(p []*restaurant.Product) []*pb.Product {
 	}
 	return sl
 }
-
-//amr = &pb.GetActualMenuResponse{
-//Salads:    ProductConv(res.Menu.Salads),
-//Garnishes: ProductConv(res.Menu.Garnishes),
-//Meats:     ProductConv(res.Menu.Meats),
-//Soups:     ProductConv(res.Menu.Soups),
-//Drinks:    ProductConv(res.Menu.Drinks),
-//Desserts:  ProductConv(res.Menu.Desserts),
-//}
-
-// m := dataMap
-// salads := menu.Salads
-// for _, v := range salads {
-// 	m[v.Uuid] = v
-// }
-
-//go natsSubscriber()

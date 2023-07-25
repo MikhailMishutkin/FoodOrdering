@@ -71,14 +71,6 @@ func (s *RestaurantService) GetUpToDateOrderList(
 	}, err
 }
 
-//nats
-//func (s *RestaurantService) GetOrder(order *types.OrderRequest) error {
-//
-//	err := s.rSer.GetOrder(order)
-//
-//	return err
-//}
-
 func convertOrders(sl []*types.OrderItem) (slo []*pb.Order) {
 	for _, v := range sl {
 		o := &pb.Order{
