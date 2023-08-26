@@ -5,6 +5,7 @@ api:
 nats:
     name: "order"
     consumername: "restaurant"
+    host: "host.docker.internal:4222"
 
 db:
-    conn: "postgresql://root:root@localhost:5444/restaurant?sslmode=disable"
+    conn: "host=host.docker.internal port=5444 user=root password=root dbname=restaurant sslmode=disable"

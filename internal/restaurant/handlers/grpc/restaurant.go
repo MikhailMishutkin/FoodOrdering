@@ -2,26 +2,25 @@ package handlers
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
+	customer2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"time"
-
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
 )
 
 type RestaurantService struct {
-	pb.UnimplementedProductServiceServer
-	pb.UnimplementedMenuServiceServer
-	pb.UnimplementedOrderServiceServer
+	restaurant.UnimplementedProductServiceServer
+	restaurant.UnimplementedMenuServiceServer
+	restaurant.UnimplementedOrderServiceServer
 
 	rSer      RestaurantServicer
-	OffClient customer.OfficeServiceClient
-	UsClient  customer.UserServiceClient
+	OffClient customer2.OfficeServiceClient
+	UsClient  customer2.UserServiceClient
 }
 
 func NewRestaurantService(
 	rs RestaurantServicer,
-	OffClient customer.OfficeServiceClient,
-	UsClient customer.UserServiceClient,
+	OffClient customer2.OfficeServiceClient,
+	UsClient customer2.UserServiceClient,
 ) *RestaurantService {
 	return &RestaurantService{
 		rSer:      rs,

@@ -2,19 +2,24 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/bootstrap"
 	handlerscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/grpc"
-	cusrepository "github.com/MikhailMishutkin/FoodOrdering/internal/customer/repository"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/customer/service"
+	natscustomer "github.com/MikhailMishutkin/FoodOrdering/internal/customer/handlers/nats"
+	natscustomerrepo "github.com/MikhailMishutkin/FoodOrdering/internal/customer/repository/nats"
+	cusrepository "github.com/MikhailMishutkin/FoodOrdering/internal/customer/repository/postgres"
+	service "github.com/MikhailMishutkin/FoodOrdering/internal/customer/service/grpc"
+	natscustomerservice "github.com/MikhailMishutkin/FoodOrdering/internal/customer/service/nats"
 	handlers "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/handlers/grpc"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
-	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service"
+	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service/grpc"
 	stathandlers "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/handlers/grpc"
 	statrepository "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/repository"
 	statservice "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/service"
-	cust "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	rest "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/statistics"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	statistics2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/statistics"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc/credentials/insecure"
@@ -22,93 +27,99 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	//"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
 	"google.golang.org/grpc"
 )
 
 func StartGRPCAndHTTPServer(conf configs.Config) error {
 	//connections to databases: pgx, gorm, sqlx
-	db, err := repository.NewDB()
+	db, err := bootstrap.NewDB()
 	if err != nil {
-		log.Fatal("cannot connect to db: ", err)
-	}
-	gorm, err := cusrepository.NewGormDB()
-	if err != nil {
-		log.Fatal("cannot connect to gorm: ", err)
+		fmt.Errorf("cannot connect to db on pqx: ", err)
 	}
 
-	dbx, err := statrepository.NewDB()
+	gorm, err := bootstrap.NewGormDB()
 	if err != nil {
-		log.Fatal("cannot connect to db on sqlx: ", err)
+		fmt.Errorf("cannot connect to gorm: ", err)
+	}
+
+	dbx, err := bootstrap.NewDBX()
+	if err != nil {
+		fmt.Errorf("cannot connect to db on sqlx: ", err)
 	}
 
 	//connection to grpc
 	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect: %v\n", err)
+		fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
 	}
 	defer conn.Close()
 
 	//restaurant
-	repo := repository.NewRestaurantRepo(db)
+	repo := repository.NewRestaurantRepo(db, conf)
 	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru, cust.NewOfficeServiceClient(conn), cust.NewUserServiceClient(conn))
+	rs := handlers.NewRestaurantService(ru, customer.NewOfficeServiceClient(conn), customer.NewUserServiceClient(conn))
 
 	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
-	cs := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
+	cs := handlerscustomer.New(restaurant.NewMenuServiceClient(conn), cu)
 
 	//statistic
-	repoS := statrepository.NewStatRepo(dbx)
+	repoS := statrepository.NewStatRepo(dbx, conf)
 	su := statservice.NewStatUsecase(repoS)
-	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
+	sh := stathandlers.NewStatService(su)
+
+	//natscustomer
+	natsP := natscustomerrepo.NewNPublisherRepo()
+	natsU := natscustomerservice.NewCNU(natsP)
+	natsH := natscustomer.NewNATS(natsU)
 
 	s := grpc.NewServer()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	rest.RegisterProductServiceServer(s, &handlers.RestaurantService{})
-	rest.RegisterMenuServiceServer(s, &handlers.RestaurantService{})
-	rest.RegisterOrderServiceServer(s, &handlers.RestaurantService{})
-	cust.RegisterOrderServiceServer(s, &handlerscustomer.CustomerService{})
-	cust.RegisterOfficeServiceServer(s, &handlerscustomer.CustomerService{})
-	cust.RegisterUserServiceServer(s, &handlerscustomer.CustomerService{})
-	statistics.RegisterStatisticsServiceServer(s, &stathandlers.StatisticService{})
+	restaurant.RegisterProductServiceServer(s, &handlers.RestaurantService{})
+	restaurant.RegisterMenuServiceServer(s, &handlers.RestaurantService{})
+	restaurant.RegisterOrderServiceServer(s, &handlers.RestaurantService{})
+	customer.RegisterOrderServiceServer(s, natsH)
+	customer.RegisterOfficeServiceServer(s, &handlerscustomer.CustomerService{})
+	customer.RegisterUserServiceServer(s, &handlerscustomer.CustomerService{})
+	statistics2.RegisterStatisticsServiceServer(s, &stathandlers.StatisticService{})
 
 	router := runtime.NewServeMux()
 
-	err = rest.RegisterProductServiceHandlerServer(ctx, router, rs)
+	err = restaurant.RegisterProductServiceHandlerServer(ctx, router, rs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
-	err = rest.RegisterMenuServiceHandlerServer(ctx, router, rs)
-	if err != nil {
-		log.Printf("Failed to register gateway: %v\n", err)
-	}
-
-	err = rest.RegisterOrderServiceHandlerServer(ctx, router, rs)
+	err = restaurant.RegisterMenuServiceHandlerServer(ctx, router, rs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
 
-	err = cust.RegisterOrderServiceHandlerServer(ctx, router, cs)
+	err = restaurant.RegisterOrderServiceHandlerServer(ctx, router, rs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
 
-	err = cust.RegisterOfficeServiceHandlerServer(ctx, router, cs)
+	err = customer.RegisterOrderServiceHandlerServer(ctx, router, natsH)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
 
-	err = cust.RegisterUserServiceHandlerServer(ctx, router, cs)
+	err = customer.RegisterOfficeServiceHandlerServer(ctx, router, cs)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
 
-	err = statistics.RegisterStatisticsServiceHandlerServer(ctx, router, sh)
+	err = customer.RegisterUserServiceHandlerServer(ctx, router, cs)
+	if err != nil {
+		log.Printf("Failed to register gateway: %v\n", err)
+	}
+
+	err = statistics2.RegisterStatisticsServiceHandlerServer(ctx, router, sh)
 	if err != nil {
 		log.Printf("Failed to register gateway: %v\n", err)
 	}
@@ -131,50 +142,51 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 
 func StartGRPC(conf configs.Config) {
 	//connections to databases: pgx, gorm, sqlx
-	db, err := repository.NewDB()
+	db, err := bootstrap.NewDB()
 	if err != nil {
-		log.Fatal("cannot connect to db: ", err)
-	}
-	gorm, err := cusrepository.NewGormDB()
-	if err != nil {
-		log.Fatal("cannot connect to gorm: ", err)
+		fmt.Errorf("cannot connect to db on pqx: ", err)
 	}
 
-	dbx, err := statrepository.NewDB()
+	gorm, err := bootstrap.NewGormDB()
 	if err != nil {
-		log.Fatal("cannot connect to db on sqlx: ", err)
+		fmt.Errorf("cannot connect to gorm: ", err)
+	}
+
+	dbx, err := bootstrap.NewDBX()
+	if err != nil {
+		fmt.Errorf("cannot connect to db on sqlx: ", err)
 	}
 
 	//connection to grpc
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect: %v\n", err)
+		fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
 	}
 	defer conn.Close()
 
 	//restaurant
-	repo := repository.NewRestaurantRepo(db)
+	repo := repository.NewRestaurantRepo(db, conf)
 	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru, cust.NewOfficeServiceClient(conn), cust.NewUserServiceClient(conn))
+	rs := handlers.NewRestaurantService(ru, customer.NewOfficeServiceClient(conn), customer.NewUserServiceClient(conn))
 
 	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
 	cu := service.NewCustomerUsecase(repoC)
-	n := handlerscustomer.New(rest.NewMenuServiceClient(conn), cu)
+	n := handlerscustomer.New(restaurant.NewMenuServiceClient(conn), cu)
 
 	//statistic
-	repoS := statrepository.NewStatRepo(dbx)
+	repoS := statrepository.NewStatRepo(dbx, conf)
 	su := statservice.NewStatUsecase(repoS)
-	sh := stathandlers.NewStatService(rest.NewProductServiceClient(conn), su)
+	sh := stathandlers.NewStatService(su)
 
 	s := grpc.NewServer()
 
-	rest.RegisterMenuServiceServer(s, rs)
-	rest.RegisterProductServiceServer(s, rs)
-	cust.RegisterOrderServiceServer(s, n)
-	cust.RegisterOfficeServiceServer(s, n) // n - &handlers_customer.CustomerService{}
-	cust.RegisterUserServiceServer(s, n)   // n - &handlers_customer.CustomerService{}
-	statistics.RegisterStatisticsServiceServer(s, sh)
+	restaurant.RegisterMenuServiceServer(s, rs)
+	restaurant.RegisterProductServiceServer(s, rs)
+	//customer.RegisterOrderServiceServer(s, n)
+	customer.RegisterOfficeServiceServer(s, n) // n - &handlers_customer.CustomerService{}
+	customer.RegisterUserServiceServer(s, n)   // n - &handlers_customer.CustomerService{}
+	statistics2.RegisterStatisticsServiceServer(s, sh)
 	lis, err := net.Listen("tcp", conf.API.GHost)
 	if err != nil {
 		log.Fatalf("Failed to listen on: %v\n", err)

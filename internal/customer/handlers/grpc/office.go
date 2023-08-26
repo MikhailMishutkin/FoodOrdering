@@ -3,11 +3,9 @@ package handlerscustomer
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/microservices/gen"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	"log"
-	"strconv"
 )
 
 func (s *CustomerService) CreateOffice(ctx context.Context, in *customer.CreateOfficeRequest) (*customer.CreateOfficeResponse, error) {
@@ -40,21 +38,4 @@ func (s *CustomerService) GetOfficeList(context.Context, *customer.GetOfficeList
 	}
 
 	return r, err
-}
-
-func convertOffice(res []*types.Office) []*customer.Office {
-	var resPb []*customer.Office
-
-	for _, v := range res {
-		id := strconv.Itoa(v.Uuid)
-		t := timestamppb.New(v.CreatedAt)
-		pr := &customer.Office{
-			Uuid:      id,
-			Name:      v.Name,
-			Address:   v.Address,
-			CreatedAt: t,
-		}
-		resPb = append(resPb, pr)
-	}
-	return resPb
 }

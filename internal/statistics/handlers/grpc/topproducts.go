@@ -2,12 +2,10 @@ package stathandlers
 
 import (
 	"context"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/statistics"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/statistics"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
-	"strconv"
 )
 
 func (s StatisticService) TopProducts(
@@ -20,8 +18,8 @@ func (s StatisticService) TopProducts(
 
 	log.Println("TopProducts stathandlers was invoked")
 
-	start := timeAssert(in.StartDate)
-	end := timeAssert(in.EndDate)
+	start := TimeAssert(in.StartDate)
+	end := TimeAssert(in.EndDate)
 	prType := int(in.GetProductType())
 
 	res, err := s.SS.TopProducts(ctx, start, end, prType)
@@ -33,37 +31,4 @@ func (s StatisticService) TopProducts(
 	return &statistics.TopProductsResponse{
 		Result: convertToRestProd(res),
 	}, err
-}
-
-func convertToRestProd(result []*types.StatProduct) (stResult []*statistics.Product) {
-	for _, v := range result {
-		p := &statistics.Product{
-			Uuid:        strconv.Itoa(v.Uuid),
-			Name:        v.Name,
-			Count:       int64(v.Count),
-			ProductType: enumSelect(v.Type),
-		}
-		stResult = append(stResult, p)
-	}
-	return stResult
-}
-
-func enumSelect(i int) statistics.StatisticsProductType {
-	switch i {
-	case 1:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_SALAD
-	case 2:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_GARNISH
-	case 3:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_MEAT
-	case 4:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_SOUP
-	case 5:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_DRINK
-	case 6:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_DESSERT
-	default:
-		return statistics.StatisticsProductType_ST_PRODUCT_TYPE_UNSPECIFIED
-	}
-
 }

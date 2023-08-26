@@ -12,3 +12,10 @@ func DateConv(t time.Time) time.Time {
 
 	return tConv
 }
+
+func concantenateProducts(sl []string, slp []string) []string {
+	for _, v := range sl {
+		slp = append(slp, v)
+	}
+	return slp
+}

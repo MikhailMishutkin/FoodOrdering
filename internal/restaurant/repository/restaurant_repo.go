@@ -2,38 +2,42 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
+
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
-	"github.com/google/uuid"
-	_ "github.com/lib/pq"
-	//_ "github.com/jackc/pgx"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/nats-io/nats.go"
 )
 
-func RandomID() string {
-	return uuid.New().String()
-}
-
 type RestaurantRepo struct {
-	DB *sql.DB
+	DB   *sql.DB
+	Conn *nats.Conn
 }
 
-func NewRestaurantRepo(db *sql.DB) *RestaurantRepo {
-	return &RestaurantRepo{
-		DB: db,
-	}
-}
-
-func NewDB() (*sql.DB, error) {
-
-	c := configs.DB{}
-
-	psqlInfo := fmt.Sprint(c.Conn)
-	fmt.Println(psqlInfo)
-
-	db, err := sql.Open("postgres", "host=localhost port=5444 user=root password=root dbname=restaurant sslmode=disable")
+func NewRestaurantRepo(db *sql.DB, conf configs.Config) *RestaurantRepo {
+	nc, err := nats.Connect(conf.NATS.Host)
 	if err != nil {
-		return nil, fmt.Errorf("can't connect to db: %v\n", err)
+		log.Println("can't connect to NATS-server: %v", err)
 	}
 
-	return db, nil
+	return &RestaurantRepo{
+		DB:   db,
+		Conn: nc,
+	}
 }
+
+//func NewDB() (*sql.DB, error) {
+//
+//	c, err := configs.New("./configs/main.yaml.template")
+//	if err != nil {
+//		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
+//	}
+//	psqlInfo := fmt.Sprint(c.DB.ConnSql)
+//
+//	db, err := sql.Open("postgres", psqlInfo)
+//	if err != nil {
+//		return nil, fmt.Errorf("can't connect to db: %v\n", err)
+//	}
+//
+//	return db, nil
+//}

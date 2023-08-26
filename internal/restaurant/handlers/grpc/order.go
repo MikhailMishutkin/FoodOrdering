@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	customer2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -20,7 +20,7 @@ func (s *RestaurantService) GetUpToDateOrderList(
 	//get OfficeList
 	requestOfficeList, err := s.OffClient.GetOfficeList(
 		context.Background(),
-		&customer.GetOfficeListRequest{},
+		&customer2.GetOfficeListRequest{},
 	)
 	if err != nil {
 		code := codes.Internal
@@ -43,7 +43,7 @@ func (s *RestaurantService) GetUpToDateOrderList(
 		officeUuid := strconv.Itoa(v.Uuid)
 		requestUserList, err := s.UsClient.GetUserList(
 			context.Background(),
-			&customer.GetUserListRequest{
+			&customer2.GetUserListRequest{
 				OfficeUuid: officeUuid,
 			},
 		)
@@ -69,31 +69,4 @@ func (s *RestaurantService) GetUpToDateOrderList(
 		TotalOrders:          convertOrders(t),
 		TotalOrdersByCompany: convertOrdersByOffice(tbo),
 	}, err
-}
-
-func convertOrders(sl []*types.OrderItem) (slo []*pb.Order) {
-	for _, v := range sl {
-		o := &pb.Order{
-			ProductId:   strconv.Itoa(v.ProductUuid),
-			ProductName: v.ProductName,
-			Count:       int64(v.Count),
-		}
-		slo = append(slo, o)
-	}
-	return slo
-}
-
-func convertOrdersByOffice(sl []*types.OrderByOffice) (tbo []*pb.OrdersByOffice) {
-
-	for _, v := range sl {
-		officeUuid := strconv.Itoa(v.OfficeUuid)
-		obo := &pb.OrdersByOffice{
-			OfficeUuid:    officeUuid,
-			OfficeName:    v.OfficeName,
-			OfficeAddress: v.OfficeAddress,
-			Result:        convertOrders(v.Result),
-		}
-		tbo = append(tbo, obo)
-	}
-	return tbo
 }

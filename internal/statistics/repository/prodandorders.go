@@ -1,28 +1,40 @@
 package statrepository
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 )
 
-func (s *StatRepo) GetProductsRepo(products []*types.Product) error {
+func (s *StatRepo) ReceiveOrdersRepo(order *types.OrderRequest) error {
+	log.Println("GetOrder (stat_repo statistics) was invoked")
+
+	resProducts, err := s.ClientProduct.GetProductList(context.Background(), &restaurant.GetProductListRequest{})
+	if err != nil {
+		code := codes.Internal
+		return status.Errorf(code, "GetProductList calling by Stat.Profit went down witn error, cannot save products in db: %v\n", err)
+	}
+
+	products, err := convertToTProduct(resProducts.Result)
+	if err != nil {
+		code := codes.Internal
+		return status.Errorf(code, "convertToProduct went down witn error, cannot save products in db: %v\n", err)
+	}
+
 	const q = `
 		INSERT INTO product (uuid, name, description, type_id, weight, price, created_at) 
-		VALUES(:id, :name, :descr, :type, :weight, :price, :created_at) ON CONFLICT DO NOTHING`
+		VALUES(:uuid, :name, :description, :type_id, :weight, :price, :created_at) ON CONFLICT DO NOTHING`
 	for _, v := range products {
 		_, err := s.DB.NamedExec(q, v)
 		if err != nil {
 
 		}
 	}
-	return nil
-}
-
-func (s *StatRepo) GetOrdersRepo(order *types.OrderRequest) error {
-	log.Println("GetOrder (stat_repo statistics) was invoked")
-
 	var slOI []*types.OrderItem
 
 	slOI = append(slOI, order.Salads...)

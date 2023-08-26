@@ -100,10 +100,3 @@ func (r *RestaurantRepo) GetMenu(t time.Time) (*types.Menu, error) {
 
 	return menu, nil
 }
-
-func concantenateProducts(sl []string, slp []string) []string {
-	for _, v := range sl {
-		slp = append(slp, v)
-	}
-	return slp
-}

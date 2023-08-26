@@ -2,21 +2,20 @@ package handlerscustomer
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 )
 
 type CustomerService struct {
-	pb.UnimplementedOfficeServiceServer
-	pb.UnimplementedOrderServiceServer
-	pb.UnimplementedUserServiceServer
+	customer.UnimplementedOfficeServiceServer
+	customer.UnimplementedUserServiceServer
 
 	client restaurant.MenuServiceClient
 	cs     CustomerServicer
 }
 
 func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerService {
-	//fmt.Println("функция нью пакета хандлерс_кастомер: ", &client)
+
 	return &CustomerService{
 		cs:     cs,
 		client: client,
@@ -28,5 +27,4 @@ type CustomerServicer interface {
 	GetOfficeList() ([]*types.Office, error)
 	CreateUser(*types.User) error
 	GetUserList(int) ([]*types.User, error)
-	CreateOrder(request *types.OrderRequest) error
 }

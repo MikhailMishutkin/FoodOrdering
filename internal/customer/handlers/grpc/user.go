@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	"log"
 	"strconv"
 )
@@ -39,23 +38,4 @@ func (s *CustomerService) GetUserList(ctx context.Context, in *pb.GetUserListReq
 	}
 
 	return response, err
-}
-
-func convertUser(res []*types.User) []*pb.User {
-	var resPb []*pb.User
-
-	for _, v := range res {
-		id := strconv.Itoa(v.Uuid)
-		ofId := strconv.Itoa(v.OfficeUuid)
-		t := timestamppb.New(v.CreatedAt)
-		pr := &pb.User{
-			Uuid:       id,
-			Name:       v.Name,
-			OfficeUuid: ofId,
-			OfficeName: v.OfficeName,
-			CreatedAt:  t,
-		}
-		resPb = append(resPb, pr)
-	}
-	return resPb
 }

@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/microservices/gen"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/microservices/gen"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"

@@ -1,31 +1,33 @@
 package natscustomer
 
 import (
+	"context"
 	"fmt"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	"github.com/golang/protobuf/proto"
-	"github.com/nats-io/nats.go"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	"log"
+	"strconv"
 )
 
-type NatsPub struct {
-	js nats.JetStream
-}
-
-func NewNATS(js nats.JetStream) *NatsPub {
-	return &NatsPub{
-		js: js,
-	}
-}
-func (np *NatsPub) NatsPublisher(order *pb.CreateOrderRequest) error {
-	log.Println("customer publisher")
-	fmt.Println(order)
-	data, err := proto.Marshal(order)
+func (n *NatsPub) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	log.Println("CreateOrder was invoked")
+	usId, err := strconv.Atoi(in.UserUuid)
 	if err != nil {
-		fmt.Errorf("cannot marshal proto message to binary: %w", err)
-		return err
+		return nil, fmt.Errorf("Can't conv user id in CreateOrder: %v\n", err)
 	}
-	fmt.Println("after marshaling: ", data)
 
-	return err
+	req := &types.OrderRequest{
+		UserUuid:  usId,
+		Salads:    convProductItem(in.Salads),
+		Garnishes: convProductItem(in.Garnishes),
+		Meats:     convProductItem(in.Meats),
+		Soups:     convProductItem(in.Soups),
+		Drinks:    convProductItem(in.Drinks),
+		Desserts:  convProductItem(in.Desserts),
+	}
+
+	err = n.ns.CreateOrder(req)
+
+	return &pb.CreateOrderResponse{}, err
+
 }

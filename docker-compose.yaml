@@ -1,11 +1,94 @@
 version: '3.1'
 services:
-  test-back:
-    container_name: restaurant-db
+  http:
+    container_name: http
+    build: .
+    restart: always
+    command: ./httpserver
+    ports:
+      - "8080:8080"
+    links:
+      - test-restaurant
+      - test-customer
+      - test-statistics
+      - nats
+    depends_on:
+      - test-restaurant
+      - test-customer
+      - test-statistics
+      - nats
+    networks:
+      - http-rest-tier
+      - http-cust-tier
+      - http-stat-tier
+      - service-tier
+  grpc:
+    build: .
+    restart: always
+    command: ./grpcserver
+    ports:
+      - "5051:5051"
+    links:
+      - test-restaurant
+      - test-customer
+      - test-statistics
+      - nats
+    depends_on:
+      - test-restaurant
+      - test-customer
+      - test-statistics
+      - nats
+    networks:
+      - grpc-rest-tier
+      - grpc-cust-tier
+      - grpc-stat-tier
+      - service-tier
+  nats:
+    image: nats
+    restart: always
+    expose:
+      - "4222"
+    ports:
+      - "4222:4222"
+    hostname: nats-server
+  worker1:
+    build: .
+    command: ./restaurant
+    links:
+        - nats
+    environment:
+        - "NATS_URI=nats://host.docker.internal:4222"
+    depends_on:
+      - nats
+      - test-restaurant
+    networks:
+      - http-rest-tier
+   #    ports:
+#      - "8181:8181"
+  worker2:
+    build: .
+    command: ./statistics
+    links:
+      - nats
+      #    environment:
+#      - "NATS_URI=nats:///host.docker.internal:4222"
+    depends_on:
+      - nats
+      - test-restaurant
+    networks:
+      - http-rest-tier
+      - http-cust-tier
+#    ports:
+#      - "8182:8182"
+  test-restaurant:
+    container_name: restaurant1-db
     image: postgres
     restart: always
     ports:
-      - "5444:5432"
+      - "5444:5444"
+    networks:
+          http-rest-tier:
+          grpc-rest-tier:
     environment:
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
@@ -15,18 +98,45 @@ services:
     image: postgres
     restart: always
     ports:
-      - "5445:5432"
+      - "5445:5445"
+    networks:
+          http-cust-tier:
+          grpc-cust-tier:
     environment:
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
       POSTGRES_DB: customer
+      POSTGRES_HOST:
   test-statistics:
     container_name: statistics-db
     image: postgres
     restart: always
     ports:
-      - "5446:5432"
+      - "5446:5446"
+    networks:
+      http-stat-tier:
+      grpc-stat-tier:
     environment:
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
       POSTGRES_DB: statistics
+#  migrate:
+#    image: migrate/migrate
+#    networks:
+#      - restaurant
+#    volumes:
+#      - .:/migrations/restaurant/postgres
+#    command: ["-path", "/migrations/restaurant/postgres", "-database", "postgres://root:root@test-restaurant:5444/restaurant?sslmode=disable", "up"]
+#    links:
+#      - test-restaurant
+#    depends_on:
+#      - test-restaurant
+networks:
+#      restaurant:
+      http-rest-tier:
+      http-cust-tier:
+      http-stat-tier:
+      grpc-rest-tier:
+      grpc-cust-tier:
+      grpc-stat-tier:
+      service-tier:

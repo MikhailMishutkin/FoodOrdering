@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"

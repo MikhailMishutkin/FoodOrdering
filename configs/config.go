@@ -22,12 +22,15 @@ type (
 	}
 
 	DB struct {
-		Conn string `yaml:"conn"`
+		ConnSql  string `yaml:"conn"`
+		ConnGorm string `yaml:"connGorm"`
+		ConnSqlx string `yaml:"connSqlx"`
 	}
 
 	NATS struct {
-		Name     string `yaml:"name",json:"name"`
-		Consumer string `yaml:"consumername",json:"consumername"`
+		Name     string `yaml:"name"`
+		Consumer string `yaml:"consumername"`
+		Host     string `yaml:"host"`
 	}
 )
 

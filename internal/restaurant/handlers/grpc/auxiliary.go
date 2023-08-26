@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/proto/pkg/customer"
-	pb "github.com/MikhailMishutkin/FoodOrdering/proto/pkg/restaurant"
+	customer2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"strconv"
@@ -14,33 +14,33 @@ func timeAssert(ts *timestamppb.Timestamp) time.Time {
 	return time.Unix(ts.Seconds, int64(ts.Nanos))
 }
 
-func enumSelect(i int) pb.ProductType {
+func enumSelect(i int) restaurant.ProductType {
 	switch i {
 	case 1:
-		return pb.ProductType_PRODUCT_TYPE_SALAD
+		return restaurant.ProductType_PRODUCT_TYPE_SALAD
 	case 2:
-		return pb.ProductType_PRODUCT_TYPE_GARNISH
+		return restaurant.ProductType_PRODUCT_TYPE_GARNISH
 	case 3:
-		return pb.ProductType_PRODUCT_TYPE_MEAT
+		return restaurant.ProductType_PRODUCT_TYPE_MEAT
 	case 4:
-		return pb.ProductType_PRODUCT_TYPE_SOUP
+		return restaurant.ProductType_PRODUCT_TYPE_SOUP
 	case 5:
-		return pb.ProductType_PRODUCT_TYPE_DRINK
+		return restaurant.ProductType_PRODUCT_TYPE_DRINK
 	case 6:
-		return pb.ProductType_PRODUCT_TYPE_DESSERT
+		return restaurant.ProductType_PRODUCT_TYPE_DESSERT
 	default:
-		return pb.ProductType_PRODUCT_TYPE_UNSPECIFIED
+		return restaurant.ProductType_PRODUCT_TYPE_UNSPECIFIED
 	}
 
 }
 
-func convertProducts(res []*types.Product) []*pb.Product {
-	var resPb []*pb.Product
+func convertProducts(res []*types.Product) []*restaurant.Product {
+	var resPb []*restaurant.Product
 
 	for _, v := range res {
 		id := strconv.Itoa(v.Uuid)
 		t := timestamppb.New(v.CreatedAt)
-		pr := &pb.Product{
+		pr := &restaurant.Product{
 			Uuid:        id,
 			Name:        v.Name,
 			Description: v.Descript,
@@ -54,7 +54,7 @@ func convertProducts(res []*types.Product) []*pb.Product {
 	return resPb
 }
 
-func convertOffice(u *customer.Office) *types.Office {
+func convertOffice(u *customer2.Office) *types.Office {
 
 	typesOffice := &types.Office{
 		Uuid:      convStr(u.Uuid),
@@ -64,7 +64,7 @@ func convertOffice(u *customer.Office) *types.Office {
 	}
 	return typesOffice
 }
-func convertUser(u *customer.User) *types.User {
+func convertUser(u *customer2.User) *types.User {
 
 	typesUser := &types.User{
 		Uuid:       convStr(u.Uuid),
@@ -82,4 +82,31 @@ func convStr(s string) int {
 		log.Printf("can't convert string to int in GetUpToDateOrderList handler: %v\n", err)
 	}
 	return i
+}
+
+func convertOrders(sl []*types.OrderItem) (slo []*restaurant.Order) {
+	for _, v := range sl {
+		o := &restaurant.Order{
+			ProductId:   strconv.Itoa(v.ProductUuid),
+			ProductName: v.ProductName,
+			Count:       int64(v.Count),
+		}
+		slo = append(slo, o)
+	}
+	return slo
+}
+
+func convertOrdersByOffice(sl []*types.OrderByOffice) (tbo []*restaurant.OrdersByOffice) {
+
+	for _, v := range sl {
+		officeUuid := strconv.Itoa(v.OfficeUuid)
+		obo := &restaurant.OrdersByOffice{
+			OfficeUuid:    officeUuid,
+			OfficeName:    v.OfficeName,
+			OfficeAddress: v.OfficeAddress,
+			Result:        convertOrders(v.Result),
+		}
+		tbo = append(tbo, obo)
+	}
+	return tbo
 }
