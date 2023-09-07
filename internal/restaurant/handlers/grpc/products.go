@@ -14,6 +14,7 @@ import (
 func (s *RestaurantService) CreateProduct(ctx context.Context, in *pb.CreateProductRequest) (*pb.CreateProductResponse, error) {
 	log.Print("CreateProduct was invoked")
 
+	var err error
 	if in.Name == "" {
 		gen.TypeSelector()
 		gen.TypeSelector()
@@ -34,7 +35,7 @@ func (s *RestaurantService) CreateProduct(ctx context.Context, in *pb.CreateProd
 
 	resp := &pb.CreateProductResponse{}
 
-	return resp, nil
+	return resp, err
 }
 
 func (s *RestaurantService) GetProductList(ctx context.Context, in *pb.GetProductListRequest) (*pb.GetProductListResponse, error) {

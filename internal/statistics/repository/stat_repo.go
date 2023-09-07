@@ -3,14 +3,12 @@ package statrepository
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
-
-	//_ "github.com/jackc/pgx"
-	_ "github.com/lib/pq"
 )
 
 type StatRepo struct {
@@ -29,6 +27,8 @@ func NewStatRepo(db *sqlx.DB, conf configs.Config) *StatRepo {
 	if err != nil {
 		log.Fatalf("Failed to connect: %v\n", err)
 	}
+	//TODO
+	log.Println(db)
 
 	return &StatRepo{
 		DB:            db,

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"database/sql"
+	"github.com/jackc/pgx/v5"
 	"log"
 
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
@@ -10,11 +10,11 @@ import (
 )
 
 type RestaurantRepo struct {
-	DB   *sql.DB
+	DB   *pgx.Conn
 	Conn *nats.Conn
 }
 
-func NewRestaurantRepo(db *sql.DB, conf configs.Config) *RestaurantRepo {
+func NewRestaurantRepo(db *pgx.Conn, conf configs.Config) *RestaurantRepo {
 	nc, err := nats.Connect(conf.NATS.Host)
 	if err != nil {
 		log.Println("can't connect to NATS-server: %v", err)

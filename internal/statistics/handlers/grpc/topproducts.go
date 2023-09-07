@@ -19,9 +19,12 @@ func (s StatisticService) TopProducts(
 	log.Println("TopProducts stathandlers was invoked")
 
 	start := TimeAssert(in.StartDate)
+	//TODO
+	log.Println(start)
 	end := TimeAssert(in.EndDate)
 	prType := int(in.GetProductType())
-
+	//TODO
+	log.Println(end, prType)
 	res, err := s.SS.TopProducts(ctx, start, end, prType)
 	if err != nil {
 		code := codes.Internal

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
@@ -26,7 +27,7 @@ FROM orders AS O
 WHERE O.on_date = $1
 GROUP BY O.product_id`
 
-	rows, err := r.DB.Query(q, date)
+	rows, err := r.DB.Query(context.Background(), q, date)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Error while select items for slice of OrderItem (GetOrderList): %v\n", err) //TODO
 	}
@@ -46,7 +47,8 @@ GROUP BY O.product_id`
 	// write offices to db
 	for _, v := range offices {
 		q = `INSERT INTO office  (id, office_name, office_address) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`
-		_, err = r.DB.Exec(q,
+		_, err = r.DB.Exec(context.Background(),
+			q,
 			v.Uuid,
 			v.Name,
 			v.Address,
@@ -59,7 +61,8 @@ GROUP BY O.product_id`
 	//write users to db
 	for _, v := range users {
 		q = `INSERT INTO users (id, user_name, office_uuid) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`
-		_, err = r.DB.Exec(q,
+		_, err = r.DB.Exec(context.Background(),
+			q,
 			v.Uuid,
 			v.Name,
 			v.OfficeUuid,
@@ -71,7 +74,7 @@ GROUP BY O.product_id`
 	}
 
 	//slice of OrdersByCompany
-	rows1, err := r.DB.Query("SELECT * FROM office")
+	rows1, err := r.DB.Query(context.Background(), "SELECT * FROM office")
 	if err != nil {
 		fmt.Errorf("can't get offices from db in GetOrderList repository: %v\n", err)
 	}
@@ -91,7 +94,7 @@ GROUP BY O.product_id`
                                                   FROM users
                                                   WHERE office_uuid = $2)
 				GROUP BY O.product_id`
-		rows2, err := r.DB.Query(q1, date, office.OfficeUuid)
+		rows2, err := r.DB.Query(context.Background(), q1, date, office.OfficeUuid)
 		if err != nil {
 			return nil, nil, fmt.Errorf("Error with select from db summ of product by office (GetOrderList): %v\n", err)
 		}
@@ -127,7 +130,7 @@ func (r *RestaurantRepo) ReceiveOrder(order *types.OrderRequest) error {
 		res2B, _ := json.Marshal(v)
 		fmt.Println(string(res2B))
 		if v.Count != 0 && v.ProductUuid != 0 {
-			_, err := r.DB.Exec(
+			_, err := r.DB.Exec(context.Background(),
 				"INSERT INTO orders (user_uuid, product_id, count) VALUES ($1, $2, $3)", //ON CONFLICT DO UPDATE SET count = EXCLUDED.count
 				order.UserUuid,
 				v.ProductUuid,

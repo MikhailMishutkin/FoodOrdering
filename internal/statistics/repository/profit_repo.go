@@ -21,7 +21,7 @@ FROM orders, product
      WHERE  orders.on_date >=$1::date
        AND    orders.on_date   <=$2::date
         AND orders.product_id = product.uuid`
-	var p []*types.Profit
+	var p []types.Profit
 	err = s.DB.SelectContext(ctx, &p, q, start, end)
 	if err != nil {
 		return 0, fmt.Errorf("Something wrong with select product count and price from db in profit stat: %v\n", err)

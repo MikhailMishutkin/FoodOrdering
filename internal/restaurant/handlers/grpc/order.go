@@ -5,6 +5,7 @@ import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	customer2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"

@@ -1,19 +1,20 @@
 package bootstrap
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/MikhailMishutkin/FoodOrdering/pkg/gormdb"
-	migrate "github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/golang-migrate/migrate/v4/source"
+	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func NewDB() (*sql.DB, error) {
+func NewDB() (*pgx.Conn, error) {
 	c, err := configs.New("./configs/main.yaml.template")
 	if err != nil {
 		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
@@ -21,32 +22,38 @@ func NewDB() (*sql.DB, error) {
 
 	psqlInfo := fmt.Sprint(c.DB.ConnSql)
 
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := pgx.Connect(context.Background(), psqlInfo)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to db: %v\n", err)
 	}
+	defer db.Close(context.Background())
+	//	defer db.Close()
 
-	m, err := migrate.New("file://migrations/restaurant/postgres", "postgres://root:root@localhost:5444/restaurant?sslmode=disable")
-	if err != nil {
-		fmt.Errorf("can't automigrate: %v\n", err)
-	}
-	if err := m.Up(); err != nil {
-		fmt.Errorf("%v\n", err)
-	}
+	//m, err := migrate.New(
+	//	"file://../FoodOrdering/migrations/restaurant/postgres",
+	//	"postgres://root:root@restaurant-db:5432/restaurant?x-migrations-table=migrate.schema_migrations?sslmode=disable",
+	//)
+	//if err != nil {
+	//	log.Println(err)
+	//	return db, fmt.Errorf("can't automigrate: %v\n", err)
+	//}
+	//if err := m.Up(); err != nil {
+	//	log.Println(err)
+	//	fmt.Errorf("%v\n", err)
+	//}
 
 	return db, nil
 }
 
 func NewGormDB() (*gorm.DB, error) {
 
-	//c, err := configs.New("./configs/main.yaml.template")
-	//if err != nil {
-	//	return nil, err
-	//}
+	c, err := configs.New("./configs/main.yaml.template")
+	if err != nil {
+		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
+	}
 
-	//psqlInfo := fmt.Sprint(c.DB.ConnGorm)
-
-	db, err := gorm.Open(postgres.Open("port=5445 user=root password=root dbname=customer sslmode=disable"))
+	psqlInfo := fmt.Sprint(c.DB.ConnGorm)
+	db, err := gorm.Open(postgres.Open(psqlInfo))
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to db: %v\n", err)
 	}
@@ -65,9 +72,14 @@ func NewGormDB() (*gorm.DB, error) {
 }
 
 func NewDBX() (*sqlx.DB, error) {
+	c, err := configs.New("./configs/main.yaml.template")
+	if err != nil {
+		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
+	}
+	psqlInfo := fmt.Sprint(c.DB.ConnSqlx)
 	db, err := sqlx.Connect(
 		"postgres",
-		"host=localhost port=5446 user=root password=root dbname=statistics sslmode=disable",
+		psqlInfo,
 	)
 
 	if err != nil {

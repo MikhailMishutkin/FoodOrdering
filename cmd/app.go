@@ -21,7 +21,7 @@ import (
 	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	statistics2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/statistics"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
@@ -35,23 +35,23 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	//connections to databases: pgx, gorm, sqlx
 	db, err := bootstrap.NewDB()
 	if err != nil {
-		fmt.Errorf("cannot connect to db on pqx: ", err)
+		return fmt.Errorf("cannot connect to db on pqx: ", err)
 	}
 
 	gorm, err := bootstrap.NewGormDB()
 	if err != nil {
-		fmt.Errorf("cannot connect to gorm: ", err)
+		return fmt.Errorf("cannot connect to gorm: ", err)
 	}
 
 	dbx, err := bootstrap.NewDBX()
 	if err != nil {
-		fmt.Errorf("cannot connect to db on sqlx: ", err)
+		return fmt.Errorf("cannot connect to db on sqlx: ", err)
 	}
 
 	//connection to grpc
 	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
+		return fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
 	}
 	defer conn.Close()
 
@@ -140,27 +140,27 @@ func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Hand
 	})
 }
 
-func StartGRPC(conf configs.Config) {
+func StartGRPC(conf configs.Config) error {
 	//connections to databases: pgx, gorm, sqlx
 	db, err := bootstrap.NewDB()
 	if err != nil {
-		fmt.Errorf("cannot connect to db on pqx: ", err)
+		return fmt.Errorf("cannot connect to db on pqx: ", err)
 	}
 
 	gorm, err := bootstrap.NewGormDB()
 	if err != nil {
-		fmt.Errorf("cannot connect to gorm: ", err)
+		return fmt.Errorf("cannot connect to gorm: ", err)
 	}
 
 	dbx, err := bootstrap.NewDBX()
 	if err != nil {
-		fmt.Errorf("cannot connect to db on sqlx: ", err)
+		return fmt.Errorf("cannot connect to db on sqlx: ", err)
 	}
 
 	//connection to grpc
 	conn, err := grpc.Dial(conf.API.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
+		return fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
 	}
 	defer conn.Close()
 
@@ -195,6 +195,7 @@ func StartGRPC(conf configs.Config) {
 	log.Printf("Listening on %s\n", conf.API.GHost)
 
 	if err = s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v\n", err)
+		return fmt.Errorf("Failed to serve: %v\n", err)
 	}
+	return nil
 }

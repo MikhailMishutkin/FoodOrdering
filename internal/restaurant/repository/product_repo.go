@@ -1,15 +1,16 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func (r *RestaurantRepo) CreateProduct(product *types.Product) error {
 
-	if err := r.DB.QueryRow(
+	if err := r.DB.QueryRow(context.Background(),
 		"INSERT INTO product (name, description, type_id, weight, price) VALUES ($1, $2, $3, $4, $5) RETURNING uuid",
 		product.Name,
 		product.Descript,
@@ -17,7 +18,7 @@ func (r *RestaurantRepo) CreateProduct(product *types.Product) error {
 		product.Weight,
 		product.Price,
 	).Scan(&product.Uuid); err != nil {
-		return err
+		return fmt.Errorf("hadn't created product in db: %v\n", err)
 	}
 
 	return nil
@@ -27,7 +28,7 @@ func (r *RestaurantRepo) GetProductList() ([]*types.Product, error) {
 
 	ps := make([]*types.Product, 0, 24)
 
-	products, err := r.DB.Query("SELECT * FROM product")
+	products, err := r.DB.Query(context.Background(), "SELECT * FROM product")
 	if err != nil {
 		return nil, fmt.Errorf("Error to get ProductList from db: %s", err)
 

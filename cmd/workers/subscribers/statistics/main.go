@@ -27,7 +27,8 @@ func main() {
 	//init statistic
 	dbx, err := bootstrap.NewDBX()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		fmt.Errorf("init err: %v\n", err)
 	}
 
 	repoS := statrepository.NewStatRepo(dbx, conf)
@@ -40,27 +41,35 @@ func main() {
 	}
 
 	for {
-		t := repository.DateConv(time.Now())
-		t1 := t.AddDate(0, 0, 1)
-		t2 := timestamppb.New(t1)
-		gMenuReq := restaurant.GetMenuRequest{
-			OnDate: t2,
-		}
-		menuResp, err := repoS.ClientMenu.GetMenu(context.Background(), &gMenuReq)
+		q, err := sub.Delivered()
 		if err != nil {
-			fmt.Errorf("restaurant GetMenu error: %v\n", err)
+			log.Println(err)
 		}
-		start := stathandlers.TimeAssert(menuResp.Menu.OpeningRecordAt)
-		end := stathandlers.TimeAssert(menuResp.Menu.ClosingRecordAt)
-
-		if time.Now().UnixNano() >= start.UnixNano() && time.Now().UnixNano() < end.UnixNano() {
-			msg, err := sub.NextMsgWithContext(context.Background())
-			if err != nil {
-				log.Fatal(err)
+		if q > 0 {
+			t := repository.DateConv(time.Now())
+			t1 := t.AddDate(0, 0, 1)
+			t2 := timestamppb.New(t1)
+			gMenuReq := restaurant.GetMenuRequest{
+				OnDate: t2,
 			}
-			if msg.Subject == "order" {
-				err = json.Unmarshal(msg.Data, order)
-				repoS.ReceiveOrdersRepo(order)
+			menuResp, err := repoS.ClientMenu.GetMenu(context.Background(), &gMenuReq)
+			if err != nil {
+				fmt.Errorf("restaurant GetMenu error: %v\n", err)
+			}
+			start := stathandlers.TimeAssert(menuResp.Menu.OpeningRecordAt)
+			end := stathandlers.TimeAssert(menuResp.Menu.ClosingRecordAt)
+
+			if time.Now().UnixNano() >= start.UnixNano() && time.Now().UnixNano() < end.UnixNano() {
+				msg, err := sub.NextMsgWithContext(context.Background())
+				if err != nil {
+					log.Fatal(err)
+				}
+				if msg.Subject == "order" {
+					err = json.Unmarshal(msg.Data, order)
+					repoS.ReceiveOrdersRepo(order)
+				}
+			} else {
+				continue
 			}
 		} else {
 			continue

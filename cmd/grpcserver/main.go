@@ -16,5 +16,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't receive config data: %v\n", err)
 	}
-	app.StartGRPC(conf)
+	err = app.StartGRPC(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

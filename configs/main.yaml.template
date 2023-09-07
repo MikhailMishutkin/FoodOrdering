@@ -1,11 +1,13 @@
 api:
-  host: "localhost:8080"
-  hostgRPC: "localhost:5051"
+  host: "http:8080"
+  hostgRPC: "grpc:5051"
 
 nats:
     name: "order"
     consumername: "restaurant"
-    host: "host.docker.internal:4222"
+    host: "nats:4222"
 
 db:
-    conn: "host=host.docker.internal port=5444 user=root password=root dbname=restaurant sslmode=disable"
+    conn: "host=restaurant-db port=5432 user=root password=root dbname=restaurant sslmode=disable"
+    connGorm: "host=customer-db port=5432 user=root password=root dbname=customer sslmode=disable"
+    connSqlx: "host=statistics-db port=5432 user=root password=root dbname=statistics sslmode=disable"

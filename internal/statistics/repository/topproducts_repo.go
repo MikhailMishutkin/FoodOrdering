@@ -35,7 +35,8 @@ func (s *StatRepo) TopProductsRepo(
 							GROUP BY orders.product_id, product.name, orders.count, product.type_id
 							ORDER BY count(*) DESC
 							LIMIT 2`
-
+	//products = make([]*types.StatProduct, 0, 24)
+	log.Println(&products)
 	err = s.DB.SelectContext(ctx, &products, q, start, end, prType)
 	if err != nil {
 		return nil, fmt.Errorf("Something wrong with select product count and type from db in TopProduct stat: %v\n", err)
