@@ -12,7 +12,7 @@ func init() {
 }
 
 func main() {
-	conf, err := configs.New("./configs/main.yaml.template")
+	conf, err := configs.New("./configs/main.yaml")
 	if err != nil {
 		log.Fatalf("can't receive config data: %v\n", err)
 	}

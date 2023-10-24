@@ -1,63 +1,84 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/bootstrap"
-	"log"
-	"time"
-
+	app "github.com/MikhailMishutkin/FoodOrdering/cmd"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"log"
 )
 
-func main() {
-	fmt.Println("Restaurant subscriber started")
+//type RestaurantSubscriber struct {
+//	con *nats.Conn
+//	natsrestaurant.NatsSub
+//	natsrestservice.RestNATSService
+//	repository.RestaurantRepo
+//}
+//
+//func NewRS() *RestaurantSubscriber {
+//	conn, err := nats.Connect(nats.DefaultURL)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	h := natsrestaurant.NewNATS()
+//	return &RestaurantSubscriber{
+//		con: conn,
+//	}
+//}
 
-	conf, err := configs.New("./configs/main.yaml.template")
-	if err != nil {
-		log.Fatal(err)
-	}
-	//init restaurant
-	db, err := bootstrap.NewDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	repo := repository.NewRestaurantRepo(db, conf)
-
-	order := &types.OrderRequest{}
-
-	sub, err := repo.Conn.SubscribeSync("order")
-	if err != nil {
-		fmt.Errorf("subscribeSync error: %v\n: ", err)
-	}
-
-	for {
-		t := repository.DateConv(time.Now())
-		t1 := t.AddDate(0, 0, 1)
-		menu, err := repo.GetMenu(t1)
-		if err != nil {
-			fmt.Errorf("restaurant GetMenu error: %v\n", err)
-		}
-		if time.Now().UnixNano() >= menu.OpenAt.UnixNano() && time.Now().UnixNano() < menu.ClosedAt.UnixNano() {
-			msg, err := sub.NextMsgWithContext(context.Background())
-			if err != nil {
-				log.Fatal(err)
-			}
-			if msg.Subject == "order" {
-				err = json.Unmarshal(msg.Data, order)
-				repo.ReceiveOrder(order)
-			}
-		} else {
-			continue
-		}
-
-	}
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 }
 
+func main() {
+	conf, err := configs.New("./configs/main.yaml")
+	if err != nil {
+		log.Fatalf("can't receive config data: %v\n", err)
+	}
+
+	if err = app.StartRestSubs(conf); err != nil {
+		log.Fatal(err)
+	}
+}
+
+//init restaurant
+//db, err := bootstrap.NewDB()
+//if err != nil {
+//	log.Fatal(err)
+//}
+//repo := repository.NewRestaurantRepo(db)
+
+//order := &types.OrderRequest{}
+//
+//restSub := NewRS()
+//
+//sub, err := restSub.con.SubscribeSync("order")
+//if err != nil {
+//	fmt.Errorf("subscribeSync error: %v\n: ", err)
+//}
+//
+//for {
+//	//t := repository.DateConv(time.Now())
+//	//t1 := t.AddDate(0, 0, 1)
+//	//t2 := t1.Add(11 * time.Hour)
+//	//t3 := t1.Add(21 * time.Hour)
+//
+//	msg, err := sub.NextMsgWithContext(context.Background())
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	if msg.Subject == "order" {
+//		err = json.Unmarshal(msg.Data, order)
+//		err := restSub.OrderReceive()
+//		if err != nil {
+//			return
+//		}
+//	}
+//if time.Now().UnixNano() >= t2.UnixNano() && time.Now().UnixNano() < t3.UnixNano() {
+//
+//} else {
+//	continue
+//}
+//}
 //nrs := natsrestaurantservice.NewNRU()
 //nrh := natsrestaurant.NewRestSubs(nrs)
 

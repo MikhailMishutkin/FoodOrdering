@@ -9,7 +9,7 @@ import (
 type CustomerService struct {
 	customer.UnimplementedOfficeServiceServer
 	customer.UnimplementedUserServiceServer
-
+	customer.UnimplementedOrderServiceServer
 	client restaurant.MenuServiceClient
 	cs     CustomerServicer
 }

@@ -13,9 +13,9 @@ type OrderRequest struct {
 }
 
 type OrderItem struct {
-	ID          int       `db:"id"'`
+	ID          int       `db:"id"`
 	OnDate      time.Time `db:"on_date"`
-	ProductUuid int       `db:"product_id"'`
+	ProductUuid int       `db:"product_id"`
 	Count       int       `db:"count"`
 	ProductName string
 }

@@ -2,7 +2,7 @@ package gen
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/bootstrap"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository/postgres"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	res "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"log"

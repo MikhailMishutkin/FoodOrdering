@@ -27,8 +27,7 @@ func main() {
 	//init statistic
 	dbx, err := bootstrap.NewDBX()
 	if err != nil {
-		log.Println(err)
-		fmt.Errorf("init err: %v\n", err)
+		log.Fatal("connect sqlx: ", err)
 	}
 
 	repoS := statrepository.NewStatRepo(dbx, conf)

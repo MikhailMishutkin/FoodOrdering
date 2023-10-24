@@ -8,14 +8,12 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func NewDB() (*pgx.Conn, error) {
-	c, err := configs.New("./configs/main.yaml.template")
+	c, err := configs.New("./configs/main.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
 	}
@@ -26,7 +24,7 @@ func NewDB() (*pgx.Conn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to db: %v\n", err)
 	}
-	defer db.Close(context.Background())
+	//defer db.Close(context.Background())
 	//	defer db.Close()
 
 	//m, err := migrate.New(
@@ -47,7 +45,7 @@ func NewDB() (*pgx.Conn, error) {
 
 func NewGormDB() (*gorm.DB, error) {
 
-	c, err := configs.New("./configs/main.yaml.template")
+	c, err := configs.New("./configs/main.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
 	}
@@ -69,21 +67,4 @@ func NewGormDB() (*gorm.DB, error) {
 	}
 
 	return db, nil
-}
-
-func NewDBX() (*sqlx.DB, error) {
-	c, err := configs.New("./configs/main.yaml.template")
-	if err != nil {
-		return nil, fmt.Errorf("Can't load config in restaurant repo: %v\n", err)
-	}
-	psqlInfo := fmt.Sprint(c.DB.ConnSqlx)
-	db, err := sqlx.Connect(
-		"postgres",
-		psqlInfo,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("can't connect to db statistcs: %v\n", err)
-	}
-	return db, err
 }

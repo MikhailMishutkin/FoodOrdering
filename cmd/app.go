@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/bootstrap"
@@ -12,11 +13,14 @@ import (
 	service "github.com/MikhailMishutkin/FoodOrdering/internal/customer/service/grpc"
 	natscustomerservice "github.com/MikhailMishutkin/FoodOrdering/internal/customer/service/nats"
 	handlers "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/handlers/grpc"
-	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository"
+	natsrestaurant "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/handlers/nats"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/repository/postgres"
 	serviceR "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service/grpc"
+	natsrestservice "github.com/MikhailMishutkin/FoodOrdering/internal/restaurant/service/nats"
 	stathandlers "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/handlers/grpc"
 	statrepository "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/repository"
 	statservice "github.com/MikhailMishutkin/FoodOrdering/internal/statistics/service"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	statistics2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/statistics"
@@ -56,9 +60,9 @@ func StartGRPCAndHTTPServer(conf configs.Config) error {
 	defer conn.Close()
 
 	//restaurant
-	repo := repository.NewRestaurantRepo(db, conf)
-	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru, customer.NewOfficeServiceClient(conn), customer.NewUserServiceClient(conn))
+	repo := repository.NewRestaurantRepo(db)
+	ru := serviceR.NewRestaurantUsecase(repo)
+	rs := handlers.NewRestaurantService(ru)
 
 	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
@@ -165,9 +169,9 @@ func StartGRPC(conf configs.Config) error {
 	defer conn.Close()
 
 	//restaurant
-	repo := repository.NewRestaurantRepo(db, conf)
-	ru := serviceR.NewRestaurantUsecace(repo)
-	rs := handlers.NewRestaurantService(ru, customer.NewOfficeServiceClient(conn), customer.NewUserServiceClient(conn))
+	repo := repository.NewRestaurantRepo(db)
+	ru := serviceR.NewRestaurantUsecase(repo)
+	rs := handlers.NewRestaurantService(ru)
 
 	//customer
 	repoC := cusrepository.NewCustomerRepo(gorm)
@@ -196,6 +200,53 @@ func StartGRPC(conf configs.Config) error {
 
 	if err = s.Serve(lis); err != nil {
 		return fmt.Errorf("Failed to serve: %v\n", err)
+	}
+	return nil
+}
+
+func StartRestSubs(conf configs.Config) error {
+	log.Println("Restaurant subscriber was started")
+	db, err := bootstrap.NewDB()
+	if err != nil {
+		return fmt.Errorf("cannot connect to db on pqx: ", err)
+	}
+
+	//connection to grpc
+	conn, err := grpc.Dial(conf.API.GHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return fmt.Errorf("Failed to create gRPC client connection: %v\n", err)
+	}
+	defer conn.Close()
+
+	//natsrestaurant
+	repo1 := repository.NewRestaurantRepo(db)
+	serv1 := natsrestservice.NewRNService(repo1)
+	handl := natsrestaurant.NewNATS(serv1, customer.NewOfficeServiceClient(conn), customer.NewUserServiceClient(conn))
+
+	order := &types.OrderRequest{}
+
+	sub, err := handl.Conn.SubscribeSync("order")
+	if err != nil {
+		return fmt.Errorf("subscribeSync error: %v\n: ", err)
+	}
+
+	for {
+		//t := repository.DateConv(time.Now())
+		//t1 := t.AddDate(0, 0, 1)
+		//t2 := t1.Add(11 * time.Hour)
+		//t3 := t1.Add(21 * time.Hour)
+
+		msg, err := sub.NextMsgWithContext(context.Background())
+		if err != nil {
+			log.Fatal(err)
+		}
+		if msg.Subject == "order" {
+			err = json.Unmarshal(msg.Data, order)
+			err := handl.OrderReceive(order)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

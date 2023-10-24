@@ -26,6 +26,7 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 		Desserts:  in.Desserts,
 	}
 	err := s.rSer.CreateMenu(mc)
+	log.Println(err)
 	if err != nil {
 		code := codes.Internal
 		return nil, status.Errorf(code, "repo.CreateMenu went down witn error, cannot create menu: %v/n ", err)

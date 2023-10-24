@@ -1,110 +1,27 @@
 version: '3.1'
 services:
-  http:
-    container_name: http
-    build: .
-    restart: always
-    command: ./httpserver
-    environment:
-      TZ: "Europe/Moscow"
-    volumes:
-      - .http:/var/lib/http
-    ports:
-      - "8080:8080"
-    depends_on:
-      - test-restaurant
-      - test-customer
-      - test-statistics
-#      - nats
-    networks:
-      - db-tier
-  grpc:
-    container_name: grpc
-    build: .
-    restart: always
-    command: ./grpcserver
-    environment:
-      TZ: "Europe/Moscow"
-    volumes:
-      - .grpc:/var/lib/grpc
-    ports:
-      - "5051:5051"
-    depends_on:
-      - test-restaurant
-      - test-customer
-      - test-statistics
-#      - nats
-    networks:
-      - db-tier
-  nats:
-    container_name: nats
-    image: nats
-    restart: always
-    environment:
-      TZ: "Europe/Moscow"
-    expose:
-      - "4222"
-    ports:
-      - "4222:4222"
-    networks:
-      - db-tier
-  worker1:
-    build: .
-    command: ./restaurant
-    links:
-        - nats
-    environment:
-        TZ: "Europe/Moscow"
-##        HOST: "NATS_URI=nats://host.docker.internal:4222"
-    depends_on:
-      - nats
-      - test-restaurant
-    networks:
-      - db-tier
-###    ports:
-#      - "8181:8181"
-  worker2:
-    build: .
-    command: ./statistics
-    links:
-      - nats
-    environment:
-      TZ: "Europe/Moscow"
-#   environment:
-#      - "NATS_URI=nats:///host.docker.internal:4222"
-    depends_on:
-      - nats
-      - test-statistics
-    networks:
-      - db-tier
-###    ports:
-###      - "8182:8182"
+
   test-restaurant:
     container_name: restaurant-db
     image: postgres
     restart: always
     ports:
       - "5444:5432"
-    networks:
-      - db-tier
+#    networks:
+#      - db-tier
     environment:
       TZ: "Europe/Moscow"
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
       POSTGRES_DB: restaurant
-    healthcheck:
-        test: test-restaurant_isready -U postgres -d restaurant
-        interval: 1s
-        timeout: 3s
-        retries: 15
   test-customer:
     container_name: customer-db
     image: postgres
     restart: always
     ports:
       - "5445:5432"
-    networks:
-      - db-tier
+#    networks:
+#      - db-tier
     environment:
       TZ: "Europe/Moscow"
       POSTGRES_PASSWORD: root
@@ -113,41 +30,129 @@ services:
   test-statistics:
     container_name: statistics-db
     image: postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
     restart: always
     ports:
       - "5446:5432"
-    networks:
-      - db-tier
+#    networks:
+#      - db-tier
     environment:
       TZ: "Europe/Moscow"
       POSTGRES_PASSWORD: root
       POSTGRES_USER: root
       POSTGRES_DB: statistics
-  migrate:
-    image: migrate/migrate
-    restart: on-failure
-    environment:
-      TZ: "Europe/Moscow"
-    networks:
-      - db-tier
-    depends_on:
-      test-restaurant:
-        condition: service_healthy
-    volumes:
-      - ./migrations/restaurant/postgres:/migrations
-    command: ["-path", "./migrations/restaurant/postgres", "--verbose", "-database", "postgres://root:root@restaurant-db:5432/restaurant?sslmode=disable", "up"]
 
-volumes:
-  pgdata:
+#  migrate:
+#    image: migrate/migrate
+#    restart: on-failure
+#    environment:
+#      TZ: "Europe/Moscow"
+#    networks:
+#      - db-tier
+#    depends_on:
+#      - test-restaurant
+#    volumes:
+#      - ./migrations/restaurant/postgres:/migrations/restaurant/postgres
+#    command: ["-path", "/migrations/restaurant/postgres/", "-database", "postgres://root:root@restaurant-db:5432/restaurant?sslmode=disable", "up"]
+#  migrate-st:
+#    image: migrate/migrate
+#    restart: on-failure
+#    environment:
+#      TZ: "Europe/Moscow"
+#    networks:
+#      - db-tier
+#    depends_on:
+#      - test-statistics
+#    volumes:
+#      - ./migrations/statistics/postgres:/migrations/statistics/postgres
+#    command: ["-path", "/migrations/statistics/postgres/", "-database", "postgres://root:root@statistics-db:5432/statistics?sslmode=disable", "up"]
+#volumes:
+#  pgdata:
+#
+#networks:
+##      restaurant:
+#  db-tier:
 
-networks:
-#      restaurant:
-  db-tier:
-
+#  worker1:
+#    build: .
+#    command: ./restaurant
 #    links:
+#        - nats
+#    environment:
+#        TZ: "Europe/Moscow"
+###        HOST: "NATS_URI=nats://host.docker.internal:4222"
+#    depends_on:
+#      - nats
+#      - test-restaurant
+#    networks:
+#      - db-tier
+####    ports:
+##      - "8181:8181"
+#  worker2:
+#    build: .
+#    command: ./statistics
+#    links:
+#      - nats
+#    environment:
+#      TZ: "Europe/Moscow"
+##   environment:
+##      - "NATS_URI=nats:///host.docker.internal:4222"
+#    depends_on:
+#      - nats
+#      - test-statistics
+#    networks:
+#      - db-tier
+###    ports:
+###      - "8182:8182"
+
+#  http:
+#    container_name: http
+#    build: .
+#    restart: always
+#    command: ./httpserver
+#    environment:
+#      TZ: "Europe/Moscow"
+#    volumes:
+#      - .http:/var/lib/http
+#    ports:
+#      - "8080:8080"
+#    depends_on:
 #      - test-restaurant
 #      - test-customer
 #      - test-statistics
+#      - migrate
 #      - nats
+#    networks:
+#      - db-tier
+#  grpc:
+#    container_name: grpc
+#    build: .
+#    restart: always
+#    command: ./grpcserver
+#    environment:
+#      TZ: "Europe/Moscow"
+#    volumes:
+#      - .grpc:/var/lib/grpc
+#    ports:
+#      - "5051:5051"
+#    depends_on:
+#      - test-restaurant
+#      - test-customer
+#      - test-statistics
+#      - migrate
+#      - nats
+#    networks:
+#      - db-tier
+#  nats:
+#    container_name: nats
+#    image: nats
+#    restart: always
+#    environment:
+#      TZ: "Europe/Moscow"
+#    expose:
+#      - "4222"
+#    ports:
+#      - "4222:4222"
+#    networks:
+#      - db-tier

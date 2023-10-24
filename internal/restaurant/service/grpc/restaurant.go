@@ -9,7 +9,7 @@ type RestaurantUsecase struct {
 	repoR RestaurantRepositorier
 }
 
-func NewRestaurantUsecace(rr RestaurantRepositorier) *RestaurantUsecase {
+func NewRestaurantUsecase(rr RestaurantRepositorier) *RestaurantUsecase {
 	return &RestaurantUsecase{
 		repoR: rr,
 	}
@@ -18,8 +18,12 @@ func NewRestaurantUsecace(rr RestaurantRepositorier) *RestaurantUsecase {
 type RestaurantRepositorier interface {
 	CreateProduct(product *types.Product) error
 	GetProductList() ([]*types.Product, error)
-	CreateMenu(mc *types.MenuCreate) error
+	SelectProductByName(string, time.Time) (int, int, error)
+	CreateDate(time.Time) (int, error)
+	CreateMenu(int, int, int) error
 	GetMenu(time.Time) (*types.Menu, error)
-	GetOrderList(time.Time, []*types.Office, []*types.User) ([]*types.OrderItem, []*types.OrderByOffice, error)
-	ReceiveOrder(order *types.OrderRequest) error
+	GetTotalOrders(time.Time) ([]*types.OrderItem, error)
+	GetOfficesList() ([]*types.OrderByOffice, error)
+	GetOrdersByOffice(time.Time, int) ([]*types.OrderItem, error)
+	ReceiveOrder(slOI []*types.OrderItem, userUuid int) error
 }

@@ -20,7 +20,10 @@ func (np *NatsPublisherRepo) NatsPublisher(order *types.OrderRequest) error {
 		Subject: "order",
 		Data:    data,
 	}
-	np.conn.PublishMsg(msg)
+	err = np.conn.PublishMsg(msg)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return err
 }

@@ -1,8 +1,6 @@
 package natscustomerrepo
 
 import (
-	"fmt"
-	"github.com/MikhailMishutkin/FoodOrdering/configs"
 	"github.com/nats-io/nats.go"
 	"log"
 )
@@ -12,11 +10,11 @@ type NatsPublisherRepo struct {
 }
 
 func NewNPublisherRepo() *NatsPublisherRepo {
-	conf, err := configs.New("./configs/main.yaml.template")
-	if err != nil {
-		fmt.Errorf("Can't load config in publisher repo: %v\n", err)
-	}
-	nc, err := nats.Connect(conf.NATS.Host)
+	//conf, err := configs.New("./configs/main.yaml.template")
+	//if err != nil {
+	//	fmt.Errorf("Can't load config in publisher repo: %v\n", err)
+	//}
+	nc, err := nats.Connect(nats.DefaultURL) //"nats:4222")
 	if err != nil {
 		log.Println("can't connect to NATS-server: %v", err)
 	}
