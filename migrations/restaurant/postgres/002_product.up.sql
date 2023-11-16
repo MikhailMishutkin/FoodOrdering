@@ -5,6 +5,6 @@ CREATE TABLE product (
                          type_id integer,
                          weight integer,
                          price numeric(6, 2),
-                         created_at timestamp DEFAULT Now(),
+                         created_at timestamptz DEFAULT Now(),
                          FOREIGN KEY (type_id) REFERENCES product_type (id) ON UPDATE CASCADE
 );

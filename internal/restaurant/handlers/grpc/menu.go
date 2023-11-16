@@ -26,7 +26,7 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 		Desserts:  in.Desserts,
 	}
 	err := s.rSer.CreateMenu(mc)
-	log.Println(err)
+
 	if err != nil {
 		code := codes.Internal
 		return nil, status.Errorf(code, "repo.CreateMenu went down witn error, cannot create menu: %v/n ", err)
@@ -39,8 +39,8 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
 	log.Print("GetMenu was invoked")
+
 	t := timeAssert(in.OnDate)
-	//t := ts.AsTime()
 
 	m, err := s.rSer.GetMenu(t)
 	if err != nil {

@@ -16,7 +16,7 @@ func NewNPublisherRepo() *NatsPublisherRepo {
 	//}
 	nc, err := nats.Connect(nats.DefaultURL) //"nats:4222")
 	if err != nil {
-		log.Println("can't connect to NATS-server: %v", err)
+		log.Println("can't connect to NATS-server:", err)
 	}
 	return &NatsPublisherRepo{
 		conn: nc,

@@ -15,7 +15,6 @@ type CustomerService struct {
 }
 
 func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerService {
-
 	return &CustomerService{
 		cs:     cs,
 		client: client,
@@ -27,4 +26,5 @@ type CustomerServicer interface {
 	GetOfficeList() ([]*types.Office, error)
 	CreateUser(*types.User) error
 	GetUserList(int) ([]*types.User, error)
+	CreateOrder(request *types.OrderRequest) error
 }

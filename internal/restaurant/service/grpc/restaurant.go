@@ -19,9 +19,12 @@ type RestaurantRepositorier interface {
 	CreateProduct(product *types.Product) error
 	GetProductList() ([]*types.Product, error)
 	SelectProductByName(string, time.Time) (int, int, error)
-	CreateDate(time.Time) (int, error)
+	CreateMenuDate(*types.MenuCreate) (int, error)
 	CreateMenu(int, int, int) error
-	GetMenu(time.Time) (*types.Menu, error)
+	GetMenuId(time.Time) (int, error)
+	GetProductId(int) ([]int, error)
+	GetMenu(int) (*types.Product, error)
+	GetTimes(int) (time.Time, time.Time, time.Time, error)
 	GetTotalOrders(time.Time) ([]*types.OrderItem, error)
 	GetOfficesList() ([]*types.OrderByOffice, error)
 	GetOrdersByOffice(time.Time, int) ([]*types.OrderItem, error)

@@ -13,13 +13,6 @@ import (
 func (n *NatsSub) OrderReceive(order *types.OrderRequest) error {
 	log.Println("OrderReceive was invoked")
 
-	//order := &types.OrderRequest{}
-
-	//sub, err := n.Conn.SubscribeSync("order")
-	//if err != nil {
-	//	log.Printf("subscribeSync error: %v\n: ", err)
-	//}
-
 	//get OfficeList
 	requestOfficeList, err := n.OffClient.GetOfficeList(
 		context.Background(),
@@ -71,35 +64,5 @@ func (n *NatsSub) OrderReceive(order *types.OrderRequest) error {
 		log.Println(err)
 	}
 
-	//for {
-	//	t := repository.DateConv(time.Now())
-	//	t1 := t.AddDate(0, 0, 1)
-	//	t2 := t1.Add(11 * time.Hour)
-	//	t3 := t1.Add(21 * time.Hour)
-	//
-	//	msg, err := sub.NextMsgWithContext(context.Background())
-	//	if err != nil {
-	//		log.Println(err)
-	//		return err
-	//	}
-	//	if msg.Subject == "order" {
-	//		err = json.Unmarshal(msg.Data, order)
-	//		err = n.Jm.DataSaveService(order, sliceOfOffices, sliceOfUsers)
-	//		if err != nil {
-	//			log.Println(err)
-	//		}
-	//	}
-	//	if time.Now().UnixNano() >= t2.UnixNano() && time.Now().UnixNano() < t3.UnixNano() {
-	//
-	//	} else {
-	//		continue
-	//	}
-	//
-	//}
 	return err
 }
-
-//menu, err := n.repo.GetMenu(t1)
-//if err != nil {
-//	fmt.Errorf("restaurant GetMenu error: %v\n", err)
-//}

@@ -3,10 +3,12 @@ package handlerscustomer
 import (
 	"context"
 	"fmt"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
 	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
 	restaurant2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -37,4 +39,27 @@ func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMen
 	}
 
 	return result, err
+}
+
+func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	log.Println("CreateOrder was invoked")
+	usId, err := strconv.Atoi(in.UserUuid)
+	if err != nil {
+		return nil, fmt.Errorf("Can't conv user id in CreateOrder: %v\n", err)
+	}
+
+	req := &types.OrderRequest{
+		UserUuid:  usId,
+		Salads:    convProductItem(in.Salads),
+		Garnishes: convProductItem(in.Garnishes),
+		Meats:     convProductItem(in.Meats),
+		Soups:     convProductItem(in.Soups),
+		Drinks:    convProductItem(in.Drinks),
+		Desserts:  convProductItem(in.Desserts),
+	}
+
+	err = s.cs.CreateOrder(req)
+
+	return &pb.CreateOrderResponse{}, err
+
 }

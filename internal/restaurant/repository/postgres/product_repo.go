@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"log"
-
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func (r *RestaurantRepo) CreateProduct(product *types.Product) error {
 
-	tag, err := r.DB.Exec(context.Background(),
+	_, err := r.DB.Exec(context.Background(),
 		"INSERT INTO product (name, description, type_id, weight, price) VALUES ($1, $2, $3, $4, $5) RETURNING uuid",
 		product.Name,
 		product.Descript,
@@ -19,10 +17,6 @@ func (r *RestaurantRepo) CreateProduct(product *types.Product) error {
 		product.Weight,
 		product.Price,
 	)
-	log.Println(tag.String(), err)
-	//	Scan(&product.Uuid); err != nil {
-	//	return fmt.Errorf("hadn't created product in db: %v\n", err)
-	//}
 
 	return err
 }

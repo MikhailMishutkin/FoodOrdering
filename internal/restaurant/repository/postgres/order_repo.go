@@ -67,14 +67,15 @@ func (r *RestaurantRepo) GetOrdersByOffice(date time.Time, id int) ([]*types.Ord
 	                                             FROM users
 	                                             WHERE office_uuid = $2)
 				GROUP BY O.product_id`
-	rows2, err := r.DB.Query(context.Background(), q1, date, id)
+	rows, err := r.DB.Query(context.Background(), q1, date, id)
 	if err != nil {
 		return nil, fmt.Errorf("Error with select from db summ of product by office (GetOrderList): %v\n", err)
 	}
+
 	var slOrderItemByOffice []*types.OrderItem
-	for rows2.Next() {
+	for rows.Next() {
 		oI := &types.OrderItem{}
-		if err = rows2.Scan(&oI.ProductUuid, &oI.ProductName, &oI.Count); err != nil {
+		if err = rows.Scan(&oI.ProductUuid, &oI.ProductName, &oI.Count); err != nil {
 			return nil, fmt.Errorf("Something wrong with rows2.Scan while scanning OrderItem for OrdersByCompany (GetOrderList): %v\n", err)
 		}
 		slOrderItemByOffice = append(slOrderItemByOffice, oI)
@@ -88,8 +89,6 @@ func (r *RestaurantRepo) ReceiveOrder(slOI []*types.OrderItem, userUuid int) err
 	log.Println("ReceiveOrder (order_repo restaurant) was invoked")
 
 	for _, v := range slOI {
-		//res2B, _ := json.Marshal(v)
-		//fmt.Println(string(res2B))
 		if v.Count != 0 && v.ProductUuid != 0 {
 			_, err := r.DB.Exec(context.Background(),
 				"INSERT INTO orders (user_uuid, product_id, count) VALUES ($1, $2, $3)", //ON CONFLICT DO UPDATE SET count = EXCLUDED.count

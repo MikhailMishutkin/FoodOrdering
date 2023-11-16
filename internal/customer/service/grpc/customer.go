@@ -2,22 +2,17 @@ package service
 
 import (
 	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 )
 
 type CustomerUsecase struct {
-	restaurant.UnimplementedOrderServiceServer
-	client restaurant.MenuServiceClient
-	repoC  CustomerRepositorier
+	repoC CustomerRepositorier
+	nr    NatsCustomerRepositorier
 }
 
-func NewCustomerUsecase(r CustomerRepositorier) *CustomerUsecase {
-	return &CustomerUsecase{repoC: r}
-}
-
-func New(client restaurant.MenuServiceClient) *CustomerUsecase {
+func NewCustomerUsecase(r CustomerRepositorier, nr NatsCustomerRepositorier) *CustomerUsecase {
 	return &CustomerUsecase{
-		client: client,
+		repoC: r,
+		nr:    nr,
 	}
 }
 
@@ -26,4 +21,8 @@ type CustomerRepositorier interface {
 	GetOfficeList() ([]*types.Office, error)
 	CreateUser(user *types.User) error
 	GetUserList(int) ([]*types.User, error)
+}
+
+type NatsCustomerRepositorier interface {
+	NatsPublisher(order *types.OrderRequest) error
 }

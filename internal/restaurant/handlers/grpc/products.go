@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-// generated 12 products by package gen if name == ""
+// will generate 12 products by package gen if name == ""
 func (s *RestaurantService) CreateProduct(ctx context.Context, in *pb.CreateProductRequest) (*pb.CreateProductResponse, error) {
 	log.Print("CreateProduct was invoked")
 

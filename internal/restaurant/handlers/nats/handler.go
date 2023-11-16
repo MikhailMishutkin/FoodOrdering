@@ -22,9 +22,7 @@ func NewNATS(jm NATSManager,
 	if err != nil {
 		log.Fatalf("can't connect to NATS: %v", err)
 	}
-	if err != nil {
-		log.Fatalf("can't connect to JetStream: %v\n", err)
-	}
+
 	return &NatsSub{
 		Conn:      nc,
 		Jm:        jm,
