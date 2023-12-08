@@ -1,7 +1,23 @@
-restaurant:
-go build -o bin/restaurant/server ./calculator/server
-go build -o bin/restaurant/client ./calculator/client
-gengw:
-protoc -I/usr/local/include -I.    -I$GOPATH    -I$GOPATH/FoodOrdering/pkg/contracts-v0.2.1/third_party/googleapis    --grpc-gateway_out=logtostderr=true:.    pkg/contracts-v0.2.1/api/mediasoft-internship/final-task/contracts/restaurant/restaurant_product.proto
+migrateup:
+	migrate -path migrations -database "$(DB_URL)" -verbose up
 
-.PHONY: gengw restaurant 
+migratedown:
+	migrate -path migrations -database "$(DB_URL)" -verbose down -1
+
+http:
+	go build -v ./cmd/httpserver
+
+grpc:
+	go build -v ./cmd/grpcserver
+
+subscribers:
+	go build -v ./cmd/workers
+	#go build -v ./cmd/workers
+
+build: grpc http subscribers
+
+nats:
+	nats-server
+
+db:
+	docker-compose up -d --build

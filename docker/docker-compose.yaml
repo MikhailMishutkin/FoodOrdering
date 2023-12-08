@@ -1,0 +1,69 @@
+version: '3.1'
+services:
+
+  test-restaurant:
+    container_name: restaurant-db
+    image: postgres
+    restart: always
+    ports:
+      - "5444:5432"
+#    networks:
+#      - db-tier
+    environment:
+      TZ: "Europe/Moscow"
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: restaurant
+  test-customer:
+    container_name: customer-db
+    image: postgres
+    restart: always
+    ports:
+      - "5445:5432"
+#    networks:
+#      - db-tier
+    environment:
+      TZ: "Europe/Moscow"
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: customer
+  test-statistics:
+    container_name: statistics-db
+    image: postgres
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5446:5432"
+#    networks:
+#      - db-tier
+    environment:
+      TZ: "Europe/Moscow"
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: statistics
+
+#  migrate:
+#    image: migrate/migrate
+#    restart: on-failure
+#    environment:
+#      TZ: "Europe/Moscow"
+#    networks:
+#      - db-tier
+#    depends_on:
+#      - test-restaurant
+#    volumes:
+#      - ./migrations/restaurant/postgres:/migrations/restaurant/postgres
+#    command: ["-path", "/migrations/restaurant/postgres/", "-database", "postgres://root:root@restaurant-db:5432/restaurant?sslmode=disable", "up"]
+#  migrate-st:
+#    image: migrate/migrate
+#    restart: on-failure
+#    environment:
+#      TZ: "Europe/Moscow"
+#    networks:
+#      - db-tier
+#    depends_on:
+#      - test-statistics
+#    volumes:
+#      - ./migrations/statistics/postgres:/migrations/statistics/postgres
+#    command: ["-path", "/migrations/statistics/postgres/", "-database", "postgres://root:root@statistics-db:5432/statistics?sslmode=disable", "up"]

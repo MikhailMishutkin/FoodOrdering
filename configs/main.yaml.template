@@ -1,0 +1,13 @@
+api:
+  host: "http:8080"
+  hostgRPC: "grpc:5051"
+
+nats:
+    name: "order"
+    consumername: "restaurant"
+    host: "nats:4222"
+
+db:
+    conn: "host=restaurant-db port=5432 user=root password=root dbname=restaurant sslmode=disable"
+    connGorm: "host=customer-db port=5432 user=root password=root dbname=customer sslmode=disable"
+    connSqlx: "host=statistics-db port=5432 user=root password=root dbname=statistics sslmode=disable"

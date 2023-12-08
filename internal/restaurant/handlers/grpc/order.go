@@ -2,13 +2,21 @@ package handlers
 
 import (
 	"context"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"log"
-
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
 )
 
-func (s *RestaurantService) GetUpToDateOrderList(ctx context.Context, in *pb.GetUpToDateOrderListRequest) (*pb.GetUpToDateOrderListResponse, error) {
+func (s *RestaurantService) GetUpToDateOrderList(
+	ctx context.Context,
+	in *pb.GetUpToDateOrderListRequest,
+) (*pb.GetUpToDateOrderListResponse, error) {
 	log.Print("GetUpToDateOrderList was invoked")
-	s.repoR.GetOrderList()
-	return nil, nil
+
+	t, tbo, err := s.rSer.GetOrderList()
+
+	return &pb.GetUpToDateOrderListResponse{
+		TotalOrders:          convertOrders(t),
+		TotalOrdersByCompany: convertOrdersByOffice(tbo),
+	}, err
 }

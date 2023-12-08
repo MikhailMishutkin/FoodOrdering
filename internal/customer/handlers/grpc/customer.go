@@ -1,22 +1,30 @@
-package handlers_customer
+package handlerscustomer
 
 import (
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	"github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 )
 
 type CustomerService struct {
-	pb.UnimplementedOfficeServiceServer
-	pb.UnimplementedOrderServiceServer
-	pb.UnimplementedUserServiceServer
-
-	repoC CustomerRepository
+	customer.UnimplementedOfficeServiceServer
+	customer.UnimplementedUserServiceServer
+	customer.UnimplementedOrderServiceServer
+	client restaurant.MenuServiceClient
+	cs     CustomerServicer
 }
 
-func NewCustomerService(rp CustomerRepository) *CustomerService {
-	return &CustomerService{repoC: rp}
+func New(client restaurant.MenuServiceClient, cs CustomerServicer) *CustomerService {
+	return &CustomerService{
+		cs:     cs,
+		client: client,
+	}
 }
 
-type CustomerRepository interface {
-	CreateOrder()
-	GetActualMenu(*pb.GetActualMenuResponse)
+type CustomerServicer interface {
+	CreateOffice(*types.Office) error
+	GetOfficeList() ([]*types.Office, error)
+	CreateUser(*types.User) error
+	GetUserList(int) ([]*types.User, error)
+	CreateOrder(request *types.OrderRequest) error
 }

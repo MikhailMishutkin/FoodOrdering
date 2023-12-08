@@ -1,50 +1,65 @@
-package handlers_customer
+package handlerscustomer
 
 import (
 	"context"
+	"fmt"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/customer"
+	restaurant2 "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
-
-	"github.com/MikhailMishutkin/FoodOrdering/internal/customer/app/client"
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/customer"
-	"github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	"strconv"
+	"time"
 )
-
-func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	return nil, nil
-}
 
 func (s *CustomerService) GetActualMenu(ctx context.Context, in *pb.GetActualMenuRequest) (*pb.GetActualMenuResponse, error) {
 	log.Println("GetActualMenu was invoked")
-	rmr, err := client.Сonn()
+
+	t := time.Now()
+	t1 := t.AddDate(0, 0, 1)
+	ts := timestamppb.New(t1)
+
+	fmt.Println(ts, s.client) //смотрим
+
+	request, err := s.client.GetMenu(context.Background(), &restaurant2.GetMenuRequest{
+		OnDate: ts,
+	})
 	if err != nil {
-		log.Println("client.Conn error", err)
+		log.Println("Can't get the menu from restaurant", err)
 		return nil, err
 	}
 
-	amr := &pb.GetActualMenuResponse{
-		Salads:    ProductConv(rmr.Menu.Salads),
-		Garnishes: ProductConv(rmr.Menu.Garnishes),
-		Meats:     ProductConv(rmr.Menu.Meats),
-		Soups:     ProductConv(rmr.Menu.Soups),
-		Drinks:    ProductConv(rmr.Menu.Drinks),
-		Desserts:  ProductConv(rmr.Menu.Desserts),
+	result := &pb.GetActualMenuResponse{
+		Salads:    convertProducts(request.Menu.Salads),
+		Garnishes: convertProducts(request.Menu.Garnishes),
+		Meats:     convertProducts(request.Menu.Meats),
+		Soups:     convertProducts(request.Menu.Soups),
+		Drinks:    convertProducts(request.Menu.Drinks),
+		Desserts:  convertProducts(request.Menu.Desserts),
 	}
-	return amr, nil
+
+	return result, err
 }
 
-func ProductConv(p []*restaurant.Product) []*pb.Product {
-	var sl []*pb.Product
-	for _, v := range p {
-		a := &pb.Product{
-			Uuid:        v.Uuid,
-			Name:        v.Name,
-			Description: v.Description,
-			Type:        pb.CustomerProductType(v.Type),
-			Weight:      v.Weight,
-			Price:       v.Price,
-			CreatedAt:   v.CreatedAt,
-		}
-		sl = append(sl, a)
+func (s *CustomerService) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	log.Println("CreateOrder was invoked")
+	usId, err := strconv.Atoi(in.UserUuid)
+	if err != nil {
+		return nil, fmt.Errorf("Can't conv user id in CreateOrder: %v\n", err)
 	}
-	return sl
+
+	req := &types.OrderRequest{
+		UserUuid:  usId,
+		Salads:    convProductItem(in.Salads),
+		Garnishes: convProductItem(in.Garnishes),
+		Meats:     convProductItem(in.Meats),
+		Soups:     convProductItem(in.Soups),
+		Drinks:    convProductItem(in.Drinks),
+		Desserts:  convProductItem(in.Desserts),
+	}
+
+	err = s.cs.CreateOrder(req)
+
+	return &pb.CreateOrderResponse{}, err
+
 }

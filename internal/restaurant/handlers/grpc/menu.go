@@ -2,32 +2,35 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"log"
-	"os"
-
-	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/contracts-v0.3.0/pkg/contracts/restaurant"
+	"github.com/MikhailMishutkin/FoodOrdering/internal/types"
+	pb "github.com/MikhailMishutkin/FoodOrdering/pkg/proto/pkg/restaurant"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"log"
+	"strconv"
 )
 
 func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuRequest) (*pb.CreateMenuResponse, error) {
 	log.Print("CreateMenu was invoked")
 
-	res, err := s.repoR.CreateMenu()
+	mc := &types.MenuCreate{
+		OnDate:    timeAssert(in.OnDate),
+		OpenAt:    timeAssert(in.OpeningRecordAt),
+		ClosedAt:  timeAssert(in.ClosingRecordAt),
+		Salads:    in.Salads,
+		Garnishes: in.Garnishes,
+		Meats:     in.Meats,
+		Soups:     in.Soups,
+		Drinks:    in.Drinks,
+		Desserts:  in.Desserts,
+	}
+	err := s.rSer.CreateMenu(mc)
+
 	if err != nil {
 		code := codes.Internal
 		return nil, status.Errorf(code, "repo.CreateMenu went down witn error, cannot create menu: %v/n ", err)
 	}
-
-	file, err := os.OpenFile("menu.json", os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-	j, _ := json.Marshal(res)
-	file.Write(j)
 
 	resp := &pb.CreateMenuResponse{}
 
@@ -37,14 +40,29 @@ func (s *RestaurantService) CreateMenu(ctx context.Context, in *pb.CreateMenuReq
 func (s *RestaurantService) GetMenu(ctx context.Context, in *pb.GetMenuRequest) (*pb.GetMenuResponse, error) {
 	log.Print("GetMenu was invoked")
 
-	ts := in.OnDate
-	//fmt.Println("время из запроса постман:", ts)
-	t := ts.AsTime()
-	//fmt.Println("время преобразованное в time:", t)
-	m := s.repoR.GetMenu(t)
-	//go repository.NatsPublisher()
+	t := timeAssert(in.OnDate)
+
+	m, err := s.rSer.GetMenu(t)
+	if err != nil {
+		return nil, err
+	}
+
 	resp := &pb.GetMenuResponse{}
-	resp.Menu = m
+	rm := &pb.Menu{
+		Uuid:            strconv.Itoa(m.Uuid),
+		OnDate:          in.OnDate,
+		OpeningRecordAt: timestamppb.New(m.OpenAt),
+		ClosingRecordAt: timestamppb.New(m.ClosedAt),
+		Salads:          convertProducts(m.Salads),
+		Garnishes:       convertProducts(m.Garnishes),
+		Meats:           convertProducts(m.Meats),
+		Soups:           convertProducts(m.Soups),
+		Drinks:          convertProducts(m.Drinks),
+		Desserts:        convertProducts(m.Desserts),
+		CreatedAt:       timestamppb.New(m.CreatedAt),
+	}
+
+	resp.Menu = rm
 
 	return resp, nil
 }
